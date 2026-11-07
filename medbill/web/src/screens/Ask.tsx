@@ -18,28 +18,36 @@ export default function Ask({ onLanguage, s, config, lang, kase, audit, msgs, se
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const end = useRef<HTMLDivElement>(null)
+  const requestVersion = useRef(0)
   const suggestions = askLang === 'en' ? config.suggested_questions : s.suggestedList
 
   useEffect(() => { end.current?.scrollIntoView({ block: 'nearest' }) }, [msgs, busy])
+  useEffect(() => () => { requestVersion.current += 1 }, [])
 
   async function send(q: string) {
     const question = q.trim()
     if (!question || busy) return
+    const version = ++requestVersion.current
+    const questionIndex = msgs.length
     setMsgs((m) => [...m, { role: 'user', text: question, lang: askLang }])
     setText(''); setBusy(true); setError('')
     try {
-      const r = await askQuestion(kase.case_id, question, 'auto')
+      const history = msgs.slice(-8).map(({ role, text }) => ({ role, text: text.slice(0, 12000) }))
+      const r = await askQuestion(kase.case_id, question, 'auto', history)
+      if (version !== requestVersion.current) return
+      setMsgs((m) => [...m.map((message, index) => index === questionIndex ? { ...message, lang: r.language } : message),
+        { role: 'assistant', text: r.answer, result: r, lang: r.verified ? r.language : 'en' }])
       try {
         if (r.language !== lang) {
-          const locale = await detectLanguage(question, interfaceText())
+          const locale = await detectLanguage(question, interfaceText(), r.language)
+          if (version !== requestVersion.current) return
           onLanguage(locale.language, locale.strings)
         }
-      } catch { setError('Your answer is ready, but the interface translation could not be updated. Please try again.') }
-      setMsgs((m) => [...m, { role: 'assistant', text: r.answer, result: r, lang: r.verified ? r.language : 'en' }])
+      } catch { if (version === requestVersion.current) setError('Your answer is ready, but the interface translation could not be updated. Please try again.') }
     } catch (e) {
-      setError(e instanceof Error ? e.message : s.tryAgain)
+      if (version === requestVersion.current) setError(e instanceof Error ? e.message : s.tryAgain)
     }
-    setBusy(false)
+    if (version === requestVersion.current) setBusy(false)
   }
 
 
@@ -66,6 +74,12 @@ export default function Ask({ onLanguage, s, config, lang, kase, audit, msgs, se
             <div key={i} className={m.role === 'user' ? 'ms-8 rounded-xl bg-blue-100 p-3' : 'me-8 rounded-xl border border-slate-300 bg-white p-3'} data-testid={`msg-${m.role}`}>
               <p className="text-sm font-semibold text-slate-700">{m.role === 'user' ? s.you : s.assistant}</p>
               <p className="text-lg" dir="auto" lang={m.lang}>{m.text}</p>
+              {m.result?.answer_en && m.result.answer_en !== m.text && (
+                <details className="mt-2 text-sm">
+                  <summary className="cursor-pointer font-semibold">{s.originalEnglish}</summary>
+                  <p className="mt-2" lang="en" dir="ltr">{m.result.answer_en}</p>
+                </details>
+              )}
               {m.result && !m.result.verified && m.result.notice && <p role="note" className="mt-2 rounded-lg bg-amber-50 p-2 text-base">{s.notVerified}</p>}
               {m.result?.deferred && <p className="mt-1 text-base font-semibold text-slate-700">{s.deferred}</p>}
               {m.result && m.result.citations.length > 0 && (

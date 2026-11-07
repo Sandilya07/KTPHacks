@@ -20,6 +20,35 @@ const toResults = async (page: Page) => {
   await page.getByTestId('headline').waitFor()
 }
 
+for (const locale of [
+  { code: 'fr', direction: 'ltr', text: 'Je veux comprendre ma facture', title: 'Comprendre votre facture' },
+  { code: 'ps', direction: 'rtl', text: 'زه غواړم خپل بل وپېژنم', title: 'خپل بل وپېژنئ' },
+  { code: 'ja', direction: 'ltr', text: '請求書について質問したいです', title: '医療費の請求書を理解する' },
+  { code: 'es-MX', direction: 'ltr', text: 'Quiero entender mi factura', title: '' },
+]) {
+  test(`automatic locale response supports ${locale.code}`, async ({ page }) => {
+    await page.route('**/api/language', async (route) => {
+      await route.fulfill({ json: { language: locale.code, strings: locale.title ? { welcomeTitle: locale.title } : {} } })
+    })
+    await page.goto('/')
+    await page.locator('#language-text').fill(locale.text)
+    await page.getByRole('button', { name: 'Send', exact: true }).click()
+    await expect(page.locator('html')).toHaveAttribute('lang', locale.code)
+    await expect(page.locator('html')).toHaveAttribute('dir', locale.direction)
+    if (locale.title) await expect(page.getByRole('heading', { level: 1 })).toHaveText(locale.title)
+    else await expect(page.getByRole('button', { name: 'Comenzar', exact: true })).toBeVisible()
+    if (locale.code === 'ps') {
+      await page.getByRole('button', { name: 'Get started', exact: true }).click()
+      await page.getByTestId('sample-overcharge').click()
+      await page.getByTestId('looks-right').waitFor()
+      await toResults(page)
+      await expect(page.getByTestId('headline')).toContainText('$412.00')
+      await page.getByRole('button', { name: 'Write the letter', exact: true }).click()
+      await expect(page.locator('pre[lang="en"]').first()).toHaveAttribute('dir', 'ltr')
+    }
+  })
+}
+
 test('overcharge sample: total, three findings, evidence highlight, ask, letter', async ({ page }) => {
   await start(page, 'overcharge')
   await toResults(page)
@@ -68,6 +97,36 @@ test('clean sample says no errors found and what was checked', async ({ page }) 
   await expect(page.locator('article')).toHaveCount(0)
 })
 
+test('typed overcharge question explains the flagged charges', async ({ page }) => {
+  await start(page, 'overcharge')
+  await toResults(page)
+  await page.getByRole('button', { name: 'Ask a question' }).click()
+  await page.getByLabel('Type your question').fill('Why am I being overcharged')
+  await page.getByRole('button', { name: 'Send', exact: true }).click()
+  const answer = page.getByTestId('msg-assistant').last()
+  await expect(answer).toContainText('$412.00')
+  await expect(answer).toContainText('80053')
+  await expect(answer.getByTestId('citation').first()).toBeVisible()
+  await expect(answer).not.toContainText('could not answer')
+  await expect(page.getByRole('combobox')).toHaveCount(0)
+})
+
+test('additional sample documents can be downloaded and reviewed', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Get started' }).click()
+  for (const sample of ['duplicate_lab', 'bundled_tests', 'insurance_mismatch', 'balance_billing', 'excess_units', 'routine_visit']) {
+    await expect(page.getByTestId(`sample-${sample}`)).toBeVisible()
+  }
+  const sample = page.getByTestId('sample-duplicate_lab')
+  const download = page.waitForEvent('download')
+  await sample.locator('..').getByRole('link', { name: 'Itemized bill', exact: true }).click()
+  expect((await download).suggestedFilename()).toBe('duplicate_lab-bill.pdf')
+  await sample.click()
+  await page.getByTestId('looks-right').waitFor()
+  await toResults(page)
+  await expect(page.getByTestId('headline')).toContainText('$30.00')
+})
+
 test('ask sample uses careful wording and shows no overcharge total', async ({ page }) => {
   await start(page, 'ask')
   await toResults(page)
@@ -94,6 +153,9 @@ test('Spanish interface, results and question', async ({ page }) => {
   await page.getByRole('button', { name: 'Hacer una pregunta' }).click()
   await page.getByRole('button', { name: '¿Cuánto debo realmente?' }).click()
   await expect(page.getByTestId('msg-assistant').first()).toContainText('$412.00')
+  const original = page.getByTestId('msg-assistant').first().getByText('Original en inglés', { exact: true })
+  await original.click()
+  await expect(page.getByTestId('msg-assistant').first().locator('p[lang="en"]')).toContainText('$412.00')
 })
 
 test('uploads: a PDF is read, a photo without a model gives a plain message', async ({ page }) => {

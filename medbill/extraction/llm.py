@@ -8,6 +8,8 @@ from typing import Protocol
 
 from PIL import Image
 
+from llm import tool_call_options
+
 from .render import Page
 from .schema import SYSTEM_PROMPT, TOOLS
 
@@ -41,8 +43,9 @@ class AnthropicExtractor:
     def _call(self, kind: str, content: list[dict]) -> dict:
         tool = TOOLS[kind]
         resp = self.client.messages.create(
-            model=self.model, max_tokens=8000, system=SYSTEM_PROMPT, tools=[tool],
-            tool_choice={"type": "tool", "name": tool["name"]},
+            model=self.model, max_tokens=8000,
+            system=SYSTEM_PROMPT + f"\nReturn the result by calling the {tool['name']} tool.", tools=[tool],
+            **tool_call_options(self.model, tool["name"]),
             messages=[{"role": "user", "content": content}],
         )
         for block in resp.content:

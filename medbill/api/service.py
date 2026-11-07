@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import io
-import re
 import json
 import tempfile
 from pathlib import Path
@@ -19,6 +18,7 @@ from extraction.render import IMAGE_SUFFIXES
 from extraction.textlayer import TextLayerExtractor
 from i18n.demo_cache import load_demo_cache
 from i18n.glossary import supported_languages
+from i18n.languages import normalize_language
 from i18n.translate import Translator
 from llm import LLMClient
 
@@ -26,7 +26,10 @@ from .settings import Settings
 from .store import Record
 
 SAMPLES = {"overcharge": "Overcharge (three findings)", "overcharge_photo": "Overcharge, phone photo",
-           "clean": "Clean bill", "ask": "Worth asking (careful wording)"}
+           "clean": "Clean bill", "ask": "Worth asking (careful wording)",
+           "duplicate_lab": "Lab test billed twice", "bundled_tests": "Tests that should be bundled",
+           "insurance_mismatch": "Bill exceeds insurance share", "balance_billing": "Full price after insurance",
+           "excess_units": "Too many blood test units", "routine_visit": "Routine visit, no overcharge"}
 TIER_LABEL = {"definite": "Definite", "likely": "Likely", "ask": "Worth asking"}
 RULE_LABEL = {"duplicate_charge": "Charges billed twice", "unbundling": "Services that should be billed together",
               "excess_units": "Too many units", "eob_mismatch": "Bill versus your insurance statement",
@@ -50,22 +53,30 @@ def languages() -> list[dict]:
 
 
 def check_lang(lang: str) -> str:
-    if not re.fullmatch(r"[a-z]{2,3}(?:-[A-Za-z]{2,8})?", lang):
+    try:
+        return normalize_language(lang)
+    except ValueError:
         raise ApiError(422, f"Language '{lang}' is not supported.")
-    return lang
 
 
 def translator_for(llm: LLMClient | None, settings: Settings) -> Translator:
     return Translator(None if settings.demo_mode else llm, cache=load_demo_cache())
 
 
+def wording_model(llm: LLMClient | None, settings: Settings) -> LLMClient | None:
+    # The rules already provide complete English explanations and letter text. Keep local AI for questions/translation.
+    return None if settings.demo_mode or getattr(llm, "provider", "") == "ollama" else llm
+
+
 def pick_extractor(app_extractor, llm: LLMClient | None, sample: str | None, settings: Settings):
     """Returns (extractor, label). Samples replay their stored extraction in DEMO_MODE or when no model is set up."""
-    if sample and (settings.demo_mode or llm is None) and app_extractor is None:
+    if sample and app_extractor is None:
         raw = json.loads((settings.samples_dir / sample / "extraction.json").read_text())
         return CachedExtractor(raw), "demo-sample"
     if app_extractor is not None:
         return app_extractor, "custom"
+    if getattr(llm, "provider", "") == "ollama":
+        return TextLayerExtractor(), "text-layer"
     if llm is not None:
         return AnthropicExtractor(), "model"
     return TextLayerExtractor(), "text-layer"
@@ -173,7 +184,7 @@ def audit_payload(rec: Record, llm: LLMClient | None, settings: Settings, lang: 
 def _audit_payload(rec: Record, llm: LLMClient | None, settings: Settings, lang: str) -> dict:
     case = run_case(rec.case)
     case.language = lang
-    explainer = Explainer(None if settings.demo_mode else llm)
+    explainer = Explainer(wording_model(llm, settings))
     translator = translator_for(llm, settings)
     items = []
     for f in case.findings:

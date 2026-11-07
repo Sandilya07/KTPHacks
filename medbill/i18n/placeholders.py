@@ -11,12 +11,12 @@ _MONTH = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s\d{1,2}
 # Order matters: alternatives are tried left to right at each position, so amounts and dates win
 # over the bare 5-character code pattern.
 PATTERN = re.compile("|".join([
-    rf"(?P<DATE>\b\d{{4}}-\d{{2}}-\d{{2}}\b|\b\d{{1,2}}/\d{{1,2}}/\d{{2,4}}\b|\b{_MONTH})",
-    r"(?P<AMT>\$\s?\d[\d,]*(?:\.\d{1,2})?|\b\d[\d,]*\.\d{2}\b)",
-    r"(?P<PCT>\b\d+(?:\.\d+)?\s?%)",
-    r"(?P<ACCT>\b[A-Z]{2,6}-\d{3,}\b)",
-    r"(?P<LINE>\b[BE]\d{1,3}\b)",
-    r"(?P<CODE>(?<![\w$.,])(?=[A-Z0-9]*\d)[A-Z0-9]{5}(?!\w|[.,]\d))",
+    rf"(?P<DATE>(?<![A-Za-z0-9_])\d{{4}}-\d{{2}}-\d{{2}}(?![A-Za-z0-9_])|(?<![A-Za-z0-9_])\d{{1,2}}/\d{{1,2}}/\d{{2,4}}(?![A-Za-z0-9_])|\b{_MONTH})",
+    r"(?P<AMT>\$\s?\d[\d,]*(?:\.\d{1,2})?|(?<![A-Za-z0-9_])\d[\d,]*\.\d{2}(?![A-Za-z0-9_]))",
+    r"(?P<PCT>(?<![A-Za-z0-9_])\d+(?:\.\d+)?\s?%)",
+    r"(?P<ACCT>(?<![A-Za-z0-9_])[A-Z]{2,6}-\d{3,}(?![A-Za-z0-9_]))",
+    r"(?P<LINE>(?<![A-Za-z0-9_])[BE]\d{1,3}(?![A-Za-z0-9_]))",
+    r"(?P<CODE>(?<![A-Za-z0-9_$.,])(?=[A-Z0-9]*\d)[A-Z0-9]{5}(?![A-Za-z0-9_]|[.,]\d))",
 ]))
 TOKEN_RE = re.compile(r"\[\[([A-Z]+)_(\d+)\]\]")
 DIGITS_RE = re.compile(r"\d+")

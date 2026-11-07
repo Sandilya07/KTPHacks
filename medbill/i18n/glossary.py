@@ -6,6 +6,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .languages import language_name, normalize_language, primary_language
+
 DIR = Path(__file__).parent
 
 # canonical term -> pattern for finding it in English source text
@@ -53,10 +55,15 @@ _cache: dict[str, Glossary] = {}
 
 
 def load_glossary(lang: str) -> Glossary:
+    lang = normalize_language(lang)
     if lang not in _cache:
         path = DIR / f"glossary_{lang}.json"
         if not path.exists():
-            return Glossary(lang, lang, False, {}, {})
+            base = primary_language(lang)
+            if base != lang and (DIR / f"glossary_{base}.json").exists():
+                parent = load_glossary(base)
+                return Glossary(lang, language_name(lang), parent.reviewed, parent.terms, parent.phrases, parent.hints)
+            return Glossary(lang, language_name(lang), False, {}, {})
         d = json.loads(path.read_text(encoding="utf-8"))
         _cache[lang] = Glossary(d["lang"], d["name"], d.get("reviewed", False), d["terms"], d["phrases"],
                                 d.get("hints", {}), d.get("speech_lang", d["lang"]))

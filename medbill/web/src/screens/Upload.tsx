@@ -80,7 +80,13 @@ export default function Upload({ s, config, onCase, onBack, onManual }: Props) {
             <p className="text-lg font-semibold">{s.orSample}</p>
             <div className="mt-3 flex flex-wrap gap-3">
               {Object.entries(config.samples).map(([key, label]) => (
-                <button key={key} type="button" className="btn-secondary" data-testid={`sample-${key}`} onClick={() => sample(key)}>{label}</button>
+                <div key={key} className="rounded-xl border border-slate-200 p-3">
+                  <button type="button" className="btn-secondary" data-testid={`sample-${key}`} onClick={() => sample(key)}>{label}</button>
+                  <div className="mt-2 flex flex-wrap gap-4 text-sm">
+                    <a className="text-teal-800 underline" href={`/api/samples/${key}/bill`} download>{s.bill}</a>
+                    <a className="text-teal-800 underline" href={`/api/samples/${key}/eob`} download>{s.eob}</a>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

@@ -2,7 +2,7 @@
 name = "medbill"
 version = "0.2.0"
 requires-python = ">=3.11"
-dependencies = ["fastapi", "uvicorn[standard]", "python-multipart", "pydantic>=2", "pymupdf", "pillow", "numpy", "anthropic", "reportlab"]
+dependencies = ["fastapi", "uvicorn[standard]", "python-multipart", "python-dotenv", "pydantic>=2", "pymupdf", "pillow", "numpy", "anthropic", "reportlab", "langcodes[data]", "langid", "hanzidentifier"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

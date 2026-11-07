@@ -1,5 +1,6 @@
 from i18n.placeholders import protect
 from i18n.translate import Translator
+import pytest
 
 EN = "Code 99213 was billed on 2024-03-05 for $95.00. This is a claim about your deductible."
 
@@ -107,3 +108,31 @@ def test_rejects_invalid_detected_language():
     import pytest
     with pytest.raises(ValueError):
         Translator(FnLLM(lambda s, u, t, n: {"language": "../../file"})).detect_language("hello")
+
+
+@pytest.mark.parametrize("value", ["", "   ", None, 123, []])
+def test_invalid_translation_values_fall_back_instead_of_being_verified(value):
+    llm = FnLLM(lambda s, u, tool, n: {"translation": value} if tool == "translate" else {"english": ""})
+    result = Translator(llm).translate("Please review this charge.", "fr")
+    assert not result.verified and result.text == "Please review this charge." and result.notice
+
+
+@pytest.mark.parametrize("value", ["", "   ", None, [], 123])
+def test_invalid_question_translation_returns_none(value):
+    assert Translator(FnLLM(lambda s, u, t, n: {"english": value})).to_english("Bonjour", "fr") is None
+
+
+def test_blank_back_translation_cannot_verify_numberless_answer():
+    llm = FnLLM(lambda s, u, tool, n: {"translation": "Veuillez vérifier."} if tool == "translate" else {"english": ""})
+    assert not Translator(llm).translate("Please review.", "fr").verified
+
+
+def test_empty_parts_does_not_crash():
+    result = Translator(None).translate_parts([], "fr")
+    assert result.text == "" and result.verified
+
+
+@pytest.mark.parametrize("lang", ["zh-hant-tw", "es-419"])
+def test_detected_language_accepts_script_and_region_subtags(lang):
+    from i18n.languages import normalize_language
+    assert Translator(FnLLM(lambda s, u, t, n: {"language": lang})).detect_language("hello") == normalize_language(lang)

@@ -7,7 +7,7 @@ import Results from './screens/Results'
 import Review from './screens/Review'
 import Upload from './screens/Upload'
 import Welcome from './screens/Welcome'
-import { t, translatedStrings, type Strings } from './strings'
+import { t, translatedStrings, languageDirection, type Strings } from './strings'
 import type { AuditResult, CaseView, Config, Highlight } from './types'
 
 export default function App() {
@@ -29,7 +29,7 @@ export default function App() {
   }
 
   useEffect(() => { getConfig().then(setConfig).catch(() => setConfigError('The server is not reachable. Please start the API and reload.')) }, [])
-  useEffect(() => { document.documentElement.lang = lang; document.documentElement.dir = /^(ar|he|fa|ur)(-|$)/.test(lang) ? 'rtl' : 'ltr' }, [lang])
+  useEffect(() => { document.documentElement.lang = lang; document.documentElement.dir = languageDirection(lang) }, [lang])
   // Move focus to the new screen's heading when the step changes (not on first load, and not when the
   // language changes, which would pull focus away from the control being used).
   const shownStep = useRef(step) // compare with the last step we focused: robust to StrictMode double effects

@@ -23,11 +23,12 @@ export interface AuditResult {
   case_id: string; total_impact: number; findings: Finding[]; no_errors: boolean; only_questions: boolean
   checked: string[]; rules_data: Record<string, string>
 }
-export interface AskResult { answer: string; language: string; kind: string; citations: string[]; deferred: boolean; verified: boolean; notice: string }
+export interface AskResult { answer: string; answer_en?: string; language: string; kind: string; citations: string[]; deferred: boolean; verified: boolean; notice: string }
 export interface LetterSegment { section: string; english: string; translated: string; verified: boolean; notice: string }
 export interface LetterResult { english: string; language: string; segments: LetterSegment[]; total: number; rows: number }
 export interface Language { code: string; name: string; speech: string; reviewed: boolean }
 export interface Config {
+  llm_provider?: string | null; model?: string | null
   demo_mode: boolean; model_available: boolean; languages: Language[]
   samples: Record<string, string>; suggested_questions: string[]
 }

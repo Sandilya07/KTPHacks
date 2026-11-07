@@ -7,7 +7,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import random
-import shutil
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -53,24 +53,47 @@ def ask_case() -> dict:
             "eob": {"payer": "Evergreen Mutual", "network_status": "in", "total_patient_responsibility": 80.0, "lines": e}}
 
 
+def additional_cases() -> dict[str, dict]:
+    kinds = {"duplicate_lab": "duplicate", "bundled_tests": "unbundled", "insurance_mismatch": "eob_mismatch",
+             "balance_billing": "balance_billing", "excess_units": "excess_units", "routine_visit": None}
+    cases = {name: gen.build_case(index + 30, kind, random.Random(120 + index))
+             for index, (name, kind) in enumerate(kinds.items())}
+    # This code has a unit limit in the bundled sample rules; ECG limits need external CMS data.
+    bill_line = cases["excess_units"]["bill"]["lines"][-1]
+    bill_line.update(code="85025", description="Blood count, complete", billed=45.0 * bill_line["units"])
+    cases["excess_units"]["eob"]["lines"][-1]["code"] = "85025"
+    return cases
+
+
 def main() -> None:
-    if OUT.exists():
-        shutil.rmtree(OUT)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--only-new", action="store_true", help="Generate only the additional sample pairs.")
+    args = parser.parse_args()
     rng = random.Random(7)
     sources = {"overcharge": json.loads((ROOT / "data" / "overcharge.json").read_text()),
                "clean": json.loads((ROOT / "data" / "clean.json").read_text()), "ask": ask_case()}
+    extras = additional_cases()
+    sources = extras if args.only_new else {**sources, **extras}
     layouts = {"overcharge": (0, 0), "clean": (1, 1), "ask": (2, 0)}
     for name, doc in sources.items():
         d = OUT / name
-        d.mkdir(parents=True)
-        bi, ei = layouts[name]
+        d.mkdir(parents=True, exist_ok=True)
+        bi, ei = layouts.get(name, (0, 0))
         bb = gen.render_pdf(d / "bill.pdf", doc["bill"], "bill", gen.BILL_LAYOUTS[bi])
         eb = gen.render_pdf(d / "eob.pdf", doc["eob"], "eob", gen.EOB_LAYOUTS[ei])
         ext = {"bill": raw_extraction(doc["bill"], "bill", bb), "eob": raw_extraction(doc["eob"], "eob", eb)}
         (d / "extraction.json").write_text(json.dumps(ext, indent=1) + "\n")
+        if name in extras:
+            from audit.engine import run_case
+            from audit.models import Bill, Case, Eob
+            case = run_case(Case(bill=Bill.model_validate(doc["bill"]), eob=Eob.model_validate(doc["eob"])))
+            (d / "expected.json").write_text(json.dumps({
+                "synthetic": True, "total_impact": case.total_impact,
+                "rules": sorted({f.rule for f in case.findings}),
+            }, indent=2) + "\n")
         if name == "overcharge":  # the phone-photo version of case 1
             p = OUT / "overcharge_photo"
-            p.mkdir()
+            p.mkdir(exist_ok=True)
             gb = gen.photo_variant(d / "bill.pdf", p / "bill.jpg", rng)
             ge = gen.photo_variant(d / "eob.pdf", p / "eob.jpg", rng)
             ext = {"bill": raw_extraction(doc["bill"], "bill", bb, gb, weak=(4,)),

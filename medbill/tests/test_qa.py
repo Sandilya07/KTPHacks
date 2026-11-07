@@ -132,3 +132,114 @@ def test_auto_detection_uses_model_for_new_languages(case):
 
 def test_build_answer_none_for_unknown_intent(case):
     assert build_answer(case, "nonsense", "x") is None
+
+
+@pytest.mark.parametrize("question", ["Why am I being overcharged", "Why is my bill so high?",
+                                      "Why are they charging me so much?", "Is my bill incorrect?"])
+def test_overcharge_questions_explain_findings_in_demo(case, question):
+    result = en_qa().ask(case, question, "en")
+    assert not result.deferred
+    assert "$412.00" in result.answer
+    assert "80053" in result.answer
+    assert result.citations and validate_text(result.answer, qa_facts(case)).ok
+
+
+def test_overcharge_question_does_not_assume_an_error_on_clean_bill(case):
+    case.findings, case.total_impact = [], 0
+    result = en_qa().ask(case, "Why am I being overcharged?", "en")
+    assert not result.deferred and "did not find" in result.answer
+
+
+def test_natural_question_uses_case_and_followup_history(case):
+    llm = ScriptedLLM({"kind": "answer", "answer": "The bill asks you to pay $502.00.",
+                       "citations": ["B2"], "case_specific": True})
+    history = [{"role": "user", "text": "Tell me about my balance"},
+               {"role": "assistant", "text": "Your bill asks for $502.00."}]
+    result = QA(Translator(None), llm).ask(case, "Can you walk me through that?", "en", history)
+    assert not result.deferred and result.kind == "natural"
+    assert result.citations == ["B2"]
+    import json
+    context = json.loads(llm.calls[0][1])
+    assert context["conversation"] == history and context["potential_overcharge"] == 412
+    assert "bill" in context and "insurance_statement" in context and context["findings"]
+
+
+@pytest.mark.parametrize("answer,citations", [("You owe $9999.99.", ["B2"]),
+                                              ("Your bill asks for $502.00.", ["B999"]),
+                                              ("Your bill asks for $502.00.", [])])
+def test_natural_answers_reject_unknown_values_or_missing_evidence(case, answer, citations):
+    llm = ScriptedLLM({"kind": "answer", "answer": answer, "citations": citations, "case_specific": True})
+    result = QA(Translator(None), llm).ask(case, "Walk me through these expenses", "en")
+    assert result.deferred and "$9999.99" not in result.answer
+
+
+def test_model_failure_still_explains_overcharges(case):
+    result = QA(Translator(None), ScriptedLLM(RuntimeError("offline"))).ask(
+        case, "Why am I being overcharged?", "en")
+    assert not result.deferred and "$412.00" in result.answer
+
+
+@pytest.mark.parametrize("lang,question", [("fr", "Pourquoi cette facture est-elle si élevée ?"),
+                                          ("hi", "मेरा बिल इतना अधिक क्यों है?"),
+                                          ("ar", "لماذا فاتورتي مرتفعة؟")])
+def test_natural_multilingual_question_detects_and_translates(case, lang, question):
+    def fn(system, user, tool, n):
+        if tool == "detect_language":
+            return {"language": lang}
+        if tool == "to_english":
+            return {"english": "Please walk me through these expenses" if "question" in system else user}
+        if tool == "answer_bill_question":
+            return {"kind": "answer", "answer": "Your bill asks for $502.00.", "citations": ["B2"], "case_specific": True}
+        return {"translation": f"[{lang}] " + user}
+    llm = FnLLM(fn)
+    result = QA(Translator(llm), llm).ask(case, question)
+    assert result.language == lang and result.verified and not result.deferred
+    assert result.answer.startswith(f"[{lang}]") and "$502.00" in result.answer
+
+
+@pytest.mark.parametrize("question,intent", [
+    ("How much do I owe according to my EOB?", "how_much_owe"),
+    ("Why was I charged twice on my EOB?", "charged_twice"),
+    ("Explain code 99214 on the EOB", "charge_meaning"),
+    ("What does EOB mean?", "what_is_eob"),
+])
+def test_eob_mentions_do_not_override_question_intent(question, intent):
+    assert detect_intent_en(question) == intent
+
+
+@pytest.mark.parametrize("citations", [None, [None], [{}], "B2"])
+def test_malformed_rephrase_citations_use_deterministic_answer(case, citations):
+    llm = ScriptedLLM({"answer": "Your bill asks for $502.00.", "citations": citations})
+    result = QA(Translator(None), llm).ask(case, "How much do I owe?", "en")
+    assert not result.deferred and "$412.00" in result.answer
+
+
+def test_zero_insurance_responsibility_is_reported(case):
+    case.eob.total_patient_responsibility = 0
+    result = en_qa().ask(case, "How much do I owe?", "en")
+    assert "Your EOB says your share is $0.00." in result.answer
+
+
+def test_numeric_case_answer_requires_evidence_even_if_model_marks_it_general(case):
+    llm = ScriptedLLM({"kind": "answer", "answer": "Your bill asks for $502.00.",
+                       "citations": [], "case_specific": False})
+    result = QA(Translator(None), llm).ask(case, "Walk me through these expenses", "en")
+    assert result.deferred
+
+
+def test_bare_code_question_uses_available_description(case):
+    result = en_qa().ask(case, "What is 80053?", "en")
+    assert not result.deferred and "blood test" in result.answer and "80053" in result.answer
+
+
+def test_explain_all_charges_again_does_not_select_duplicate_intent(case):
+    result = en_qa().ask(case, "Can you explain all the charges again", "en")
+    assert result.kind == "all_charges" and not result.deferred
+    for line in case.bill.lines:
+        assert line.id in result.citations
+
+
+def test_question_translation_failure_does_not_claim_document_evidence_is_missing(case):
+    result = QA(Translator(None)).ask(case, "Bonjour, pouvez-vous expliquer ceci ?", "fr")
+    assert result.kind == "translation_unavailable" and not result.deferred
+    assert "translate your question" in result.answer and "documents for this case do not show" not in result.answer

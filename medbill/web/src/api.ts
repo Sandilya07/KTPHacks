@@ -50,8 +50,8 @@ export const patchLines = (id: string, body: object) =>
 export const confirmCase = (id: string) => fetch(`${BASE}/cases/${id}/confirm`, { method: 'POST' }).then((r) => json<CaseView>(r))
 export const runAudit = (id: string, lang: string, onProgress: (m: string) => void) =>
   streamPost<AuditResult>(`/cases/${id}/audit?lang=${lang}`, undefined, onProgress)
-export const askQuestion = (id: string, question: string, language: string) =>
-  fetch(`${BASE}/cases/${id}/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, language }) }).then((r) => json<AskResult>(r))
+export const askQuestion = (id: string, question: string, language = 'auto', history: { role: 'user' | 'assistant'; text: string }[] = []) =>
+  fetch(`${BASE}/cases/${id}/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, language, history }) }).then((r) => json<AskResult>(r))
 export const letterUrl = (id: string, p: Record<string, string>) => `${BASE}/cases/${id}/letter?${new URLSearchParams(p)}`
 export const getLetter = (id: string, p: Record<string, string>) => fetch(letterUrl(id, { ...p, format: 'json' })).then((r) => json<LetterResult>(r))
 export const sourceUrl = (id: string, doc: string, page: number) => `${BASE}/cases/${id}/source/${page}?doc=${doc}`
@@ -66,6 +66,6 @@ export function createManual() {
   return fetch(`${BASE}/cases/manual`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => json<CaseView>(r))
 }
 
-export const detectLanguage = (text: string, strings: Record<string, string>) =>
-  fetch(BASE + '/language', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, strings }) })
+export const detectLanguage = (text: string, strings: Record<string, string>, language?: string) =>
+  fetch(BASE + '/language', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, strings, language }) })
     .then((r) => json<{ language: string; strings: Record<string, string>; notice?: string }>(r))

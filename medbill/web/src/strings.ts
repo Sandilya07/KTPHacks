@@ -1,6 +1,7 @@
 // Interface text. English is the source. Spanish and Mongolian are DRAFTS written by Claude and need
 // review by a native speaker. Numbers, codes and dates are never part of these strings.
 const en = {
+  originalEnglish: 'Original English',
   appName: 'MedBill Auditor',
   banner: 'Informational only. This is not legal or medical advice. Your documents stay in memory and are deleted when you finish.',
   skip: 'Skip to main content',
@@ -91,6 +92,7 @@ const en = {
 export type Strings = typeof en
 
 const es: Strings = {
+  originalEnglish: 'Original en inglés',
   appName: 'Auditor de Facturas Médicas',
   banner: 'Solo informativo. No es asesoría legal ni médica. Sus documentos permanecen en la memoria y se borran cuando termina.',
   skip: 'Saltar al contenido principal',
@@ -180,6 +182,7 @@ const es: Strings = {
 }
 
 const mn: Strings = {
+  originalEnglish: 'Англи эх',
   appName: 'Эмнэлгийн нэхэмжлэх шалгагч',
   banner: 'Зөвхөн мэдээллийн зорилготой. Энэ нь хууль зүйн болон эмнэлгийн зөвлөгөө биш. Таны баримт бичиг санах ойд л байх бөгөөд дууссаны дараа устгагдана.',
   skip: 'Үндсэн агуулга руу очих',
@@ -269,7 +272,14 @@ const mn: Strings = {
 }
 
 export const STRINGS: Record<string, Strings> = { en, es, mn }
-export const t = (lang: string): Strings => STRINGS[lang] ?? en
+export const t = (lang: string): Strings => STRINGS[lang] ?? STRINGS[lang.split('-')[0]] ?? en
+
+export function languageDirection(lang: string): 'rtl' | 'ltr' {
+  try {
+    const script = new Intl.Locale(lang).maximize().script
+    return new Set(['Arab', 'Hebr', 'Thaa', 'Syrc', 'Nkoo', 'Adlm', 'Rohg', 'Samr', 'Mand']).has(script ?? '') ? 'rtl' : 'ltr'
+  } catch { return 'ltr' }
+}
 export const fmt = (s: string, vars: Record<string, string | number>): string =>
   s.replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k] ?? ''))
 export const money = (n: number): string => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`

@@ -51,7 +51,7 @@ export default function Letter({ s, lang, kase, onBack }: Props) {
           {lang === 'en' ? (
             <section aria-labelledby="en-h" className="card">
               <h2 id="en-h" className="text-xl font-bold">{s.english}</h2>
-              <pre lang="en" className="mt-2 whitespace-pre-wrap font-sans text-base" data-testid="letter-english">{letter.english}</pre>
+              <pre lang="en" dir="ltr" className="mt-2 whitespace-pre-wrap font-sans text-base" data-testid="letter-english">{letter.english}</pre>
             </section>
           ) : (
             <div className="space-y-4" data-testid="letter-side-by-side">
@@ -59,10 +59,10 @@ export default function Letter({ s, lang, kase, onBack }: Props) {
                 <h2 className="text-xl font-bold">{s.english}</h2>
                 <h2 className="text-xl font-bold">{s.translation}</h2>
               </div>
-              <div className="card"><pre lang="en" className="whitespace-pre-wrap font-sans text-base">{header}</pre></div>
+              <div className="card"><pre lang="en" dir="ltr" className="whitespace-pre-wrap font-sans text-base">{header}</pre></div>
               {letter.segments.map((seg, i) => (
                 <div key={i} className="grid gap-3 md:grid-cols-2">
-                  <div className="card" lang="en"><p className="mb-1 text-sm font-semibold text-slate-600 md:hidden">{s.english}</p><p className="text-base">{seg.english}</p></div>
+                  <div className="card" lang="en" dir="ltr"><p className="mb-1 text-sm font-semibold text-slate-600 md:hidden">{s.english}</p><p className="text-base">{seg.english}</p></div>
                   <div className="card" lang={seg.verified ? lang : 'en'}>
                     <p className="mb-1 text-sm font-semibold text-slate-600 md:hidden">{s.translation}</p>
                     <p className="text-base">{seg.translated}</p>
@@ -71,7 +71,7 @@ export default function Letter({ s, lang, kase, onBack }: Props) {
                 </div>
               ))}
               <details className="card"><summary className="cursor-pointer text-lg font-semibold">{s.english}</summary>
-                <pre lang="en" className="mt-2 whitespace-pre-wrap font-sans text-base">{letter.english}</pre></details>
+                <pre lang="en" dir="ltr" className="mt-2 whitespace-pre-wrap font-sans text-base">{letter.english}</pre></details>
             </div>
           )}
         </div>

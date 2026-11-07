@@ -6,9 +6,20 @@ tool input dict. The model name comes from the MODEL environment variable."""
 from __future__ import annotations
 
 import os
+import json
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 from typing import Protocol
 
 DEFAULT_MODEL = "claude-sonnet-5-5"
+
+
+def tool_call_options(model: str, tool_name: str) -> dict:
+    if model == "claude-sonnet-5-5":
+        # Sonnet 5.5 rejects forced tool choice; avoid spending the small response budget on up-front thinking.
+        return {"tool_choice": {"type": "auto"}, "thinking": {"type": "between_tools"},
+                "output_config": {"effort": "medium"}}
+    return {"tool_choice": {"type": "tool", "name": tool_name}}
 
 
 class LLMClient(Protocol):
@@ -16,6 +27,7 @@ class LLMClient(Protocol):
 
 
 class AnthropicLLM:
+    provider = "anthropic"
     def __init__(self, client=None, model: str | None = None, max_tokens: int = 2000):
         if client is None:
             import anthropic
@@ -26,8 +38,8 @@ class AnthropicLLM:
     def complete_tool(self, system: str, user: str, tool: dict) -> dict:
         resp = self.client.messages.create(
             model=self.model, max_tokens=max(self.max_tokens, 12000) if tool["name"] == "translate_interface" else self.max_tokens,
-            system=system, tools=[tool],
-            tool_choice={"type": "tool", "name": tool["name"]},
+            system=system + f"\nReturn the result by calling the {tool['name']} tool. Do not answer in plain text.",
+            tools=[tool], **tool_call_options(self.model, tool["name"]),
             messages=[{"role": "user", "content": user}],
         )
         for block in resp.content:
@@ -36,6 +48,52 @@ class AnthropicLLM:
         raise RuntimeError("Model did not return the tool call")
 
 
+class OllamaLLM:
+    """Local structured JSON generation using the same interface as the hosted client."""
+
+    provider = "ollama"
+
+    def __init__(self, model: str | None = None, base_url: str | None = None, timeout: float = 180):
+        self.model = model or os.environ.get("OLLAMA_MODEL", "qwen3:4b")
+        self.base_url = (base_url or os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")).rstrip("/")
+        self.timeout = timeout
+        if self.model.endswith(":cloud"):
+            raise ValueError("Select a downloaded local Ollama model, not a cloud model.")
+
+    def complete_tool(self, system: str, user: str, tool: dict) -> dict:
+        budgets = {"detect_language": 64, "understand_bill_question": 160, "translate_interface": 1536,
+                   "translate_spans": 1024, "to_english": 1024, "translate": 1024}
+        payload = {
+            "model": self.model, "stream": False, "think": False, "keep_alive": "15m",
+            "format": tool["input_schema"],
+            "messages": [
+                {"role": "system", "content": system + "\nReturn a JSON object only, matching this schema: "
+                 + json.dumps(tool["input_schema"])},
+                {"role": "user", "content": user},
+            ],
+            "options": {"temperature": 0, "repeat_penalty": 1.1, "num_ctx": 8192,
+                        "num_predict": budgets.get(tool["name"], 1024)},
+        }
+        request = Request(self.base_url + "/api/chat", data=json.dumps(payload).encode("utf-8"),
+                          headers={"Content-Type": "application/json"}, method="POST")
+        try:
+            with urlopen(request, timeout=self.timeout) as response:
+                result = json.load(response)
+        except (HTTPError, URLError, TimeoutError) as exc:
+            raise RuntimeError("Local AI is unavailable. Start Ollama and run: ollama pull " + self.model) from exc
+        if result.get("done_reason") == "length":
+            raise RuntimeError("The local model response was cut short. Try a shorter question.")
+        content = json.loads(result.get("message", {}).get("content", ""))
+        if not isinstance(content, dict):
+            raise ValueError("Local model did not return a JSON object.")
+        return content
+
+
 def llm_from_env() -> LLMClient | None:
-    """A live client when ANTHROPIC_API_KEY is set, otherwise None (callers use deterministic paths)."""
+    """Select local Ollama or the hosted provider. Ollama never requires an API key."""
+    provider = os.environ.get("LLM_PROVIDER", "anthropic").strip().lower()
+    if provider == "ollama":
+        return OllamaLLM()
+    if provider != "anthropic":
+        raise ValueError("LLM_PROVIDER must be ollama or anthropic.")
     return AnthropicLLM() if os.environ.get("ANTHROPIC_API_KEY") else None

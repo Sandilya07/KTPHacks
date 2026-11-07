@@ -4,7 +4,14 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def load_environment(env_file: Path | None = None) -> None:
+    """Load local configuration at server startup; explicit process variables take precedence."""
+    load_dotenv(env_file if env_file is not None else ROOT / ".env", override=False)
 
 
 def _flag(name: str) -> bool:
