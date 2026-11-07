@@ -2,6 +2,7 @@
 and the temporary files are removed straight after extraction."""
 from __future__ import annotations
 
+import threading
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -20,6 +21,7 @@ class Record:
     sample: str | None = None
     extractor: str = ""
     touched: float = field(default_factory=time.time)
+    lock: threading.Lock = field(default_factory=threading.Lock)  # serialises audits of one case
 
 
 class CaseNotFound(KeyError):

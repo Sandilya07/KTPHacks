@@ -193,3 +193,12 @@ def test_demo_mode_never_uses_a_model():
         cid, a = confirmed_audit(c)
         assert a["total_impact"] == 412.0
         assert c.post(f"/cases/{cid}/ask", json={"question": "What is an EOB?", "language": "en"}).status_code == 200
+
+
+def test_double_audit_request_does_not_double_count(client):
+    from concurrent.futures import ThreadPoolExecutor
+    cid = start(client)["case_id"]
+    client.post(f"/cases/{cid}/confirm")
+    with ThreadPoolExecutor(4) as ex:
+        results = list(ex.map(lambda _: client.post(f"/cases/{cid}/audit").json(), range(8)))
+    assert all(r["total_impact"] == 412.0 and len(r["findings"]) == 3 for r in results)

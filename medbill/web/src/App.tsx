@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { createManual, deleteCase, getConfig } from './api'
 import { Banner, ErrorBox, Screen, Spinner, Stepper } from './components/Chrome'
+import Results from './screens/Results'
 import Review from './screens/Review'
 import Upload from './screens/Upload'
 import Welcome from './screens/Welcome'
 import { t } from './strings'
-import type { CaseView, Config } from './types'
+import type { AuditResult, CaseView, Config, Highlight } from './types'
 
 export default function App() {
   const [config, setConfig] = useState<Config | null>(null)
@@ -13,6 +14,8 @@ export default function App() {
   const [lang, setLang] = useState('en')
   const [step, setStep] = useState(0)
   const [kase, setCase] = useState<CaseView | null>(null)
+  const [audit, setAudit] = useState<AuditResult | null>(null)
+  const [highlight, setHighlight] = useState<Highlight>({ ids: [], nonce: 0 })
   const main = useRef<HTMLElement>(null)
   const s = t(lang)
 
@@ -22,6 +25,8 @@ export default function App() {
   async function restart() {
     if (kase) await deleteCase(kase.case_id)
     setCase(null)
+    setAudit(null)
+    setHighlight({ ids: [], nonce: 0 })
     setStep(0)
   }
 
@@ -39,8 +44,9 @@ export default function App() {
         {!config && !configError && <Screen title={s.appName}><Spinner message={s.loading} /></Screen>}
         {config && step === 0 && <Welcome s={s} config={config} lang={lang} setLang={setLang} onStart={() => setStep(1)} />}
         {config && step === 1 && <Upload s={s} config={config} onCase={(c) => { setCase(c); setStep(2) }} onBack={() => setStep(0)} onManual={() => createManual().then((c) => { setCase(c); setStep(2) })} />}
-        {config && step === 2 && kase && <Review key={kase.case_id} s={s} kase={kase} onConfirmed={(c) => { setCase(c); setStep(3) }} onBack={() => setStep(1)} />}
-        {config && step === 3 && <Screen title={s.resultsTitle}><p>{kase?.case_id}</p></Screen>}
+        {config && step === 2 && kase && <Review key={kase.case_id} s={s} kase={kase} onConfirmed={(c) => { setCase(c); setAudit(null); setHighlight({ ids: [], nonce: 0 }); setStep(3) }} onBack={() => setStep(1)} />}
+        {config && step === 3 && kase && <Results s={s} lang={lang} kase={kase} audit={audit} setAudit={setAudit} highlight={highlight} setHighlight={setHighlight} onAsk={() => setStep(4)} onLetter={() => setStep(5)} onBack={() => setStep(2)} />}
+        {config && step === 4 && <Screen title={s.askTitle}><p /></Screen>}
       </main>
     </>
   )

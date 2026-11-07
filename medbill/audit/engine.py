@@ -9,9 +9,15 @@ from .rules import load_rules
 
 
 def run_case(case: Case) -> Case:
-    case.findings = []
+    """Run every rule and store the findings on the case.
+
+    Rules see earlier findings through `work.findings`, so the working list lives on a private copy and
+    is only assigned to the case at the end. Two audits of the same case at once (a double request from
+    the browser) therefore cannot interleave and duplicate findings."""
+    work = case.model_copy(update={"findings": []})
     for rule in load_rules():
-        case.findings.extend(rule.run(case))
+        work.findings.extend(rule.run(work))
+    case.findings = work.findings
     case.total_impact = round(sum(f.impact for f in case.findings), 2)
     return case
 

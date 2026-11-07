@@ -165,6 +165,11 @@ def apply_edits(rec: Record, body: dict) -> None:
 
 # ---- audit -----------------------------------------------------------------------------------------
 def audit_payload(rec: Record, llm: LLMClient | None, settings: Settings, lang: str) -> dict:
+    with rec.lock:
+        return _audit_payload(rec, llm, settings, lang)
+
+
+def _audit_payload(rec: Record, llm: LLMClient | None, settings: Settings, lang: str) -> dict:
     case = run_case(rec.case)
     case.language = lang
     explainer = Explainer(None if settings.demo_mode else llm)

@@ -115,3 +115,13 @@ def test_matching_prefers_modifiers_then_order_and_logs_unmatched():
     c = case([bl("B1"), bl("B2", "85025")], [el("E1"), el("E9", "99999")])
     m = match_lines(c)
     assert [b.id for b in m.unmatched_bill] == ["B2"] and [e.id for e in m.unmatched_eob] == ["E9"]
+
+
+def test_concurrent_audits_of_one_case_never_duplicate_findings():
+    from concurrent.futures import ThreadPoolExecutor
+
+    from tests.helpers import overcharge_case
+    c = overcharge_case()
+    with ThreadPoolExecutor(8) as ex:
+        list(ex.map(lambda _: run_case(c), range(40)))
+    assert len(c.findings) == 3 and c.total_impact == 412.0
