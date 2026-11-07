@@ -150,8 +150,10 @@ export default function Review({ s, kase, onConfirmed, onBack }: Props) {
                       </div>
                     )
                   })}
-                  <button type="button" className="btn-secondary col-span-2 min-h-11 md:col-span-1 md:px-0" aria-label={fmt(s.removeLine, { id: r.isNew ? '' : r.id })}
-                    onClick={() => removeLine(r.id)}><span aria-hidden>✕</span></button>
+                  <div role="cell" className="col-span-2 md:col-span-1">
+                    <button type="button" className="btn-secondary min-h-11 w-full md:px-0" aria-label={fmt(s.removeLine, { id: r.isNew ? '' : r.id })}
+                      onClick={() => removeLine(r.id)}><span aria-hidden>✕</span></button>
+                  </div>
                 </div>
               ))}
             </div>

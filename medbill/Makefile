@@ -1,5 +1,5 @@
 PY ?= python3
-.PHONY: test lint eval data
+.PHONY: test lint eval data web-test
 test:
 	$(PY) -m pytest -q
 lint:
@@ -11,3 +11,5 @@ eval: data
 	$(PY) scripts/eval_extraction.py
 	$(PY) scripts/eval_explainer.py
 	$(PY) scripts/eval_i18n.py
+web-test:
+	cd web && PY=$(abspath $(PY)) npx playwright test flow

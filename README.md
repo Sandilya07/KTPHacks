@@ -5,7 +5,7 @@ errors with evidence, ask questions in your own language, and generate a dispute
 
 > Informational only. Not legal or medical advice. **Synthetic data only: never use real patient information.**
 
-**Status:** Phases 1 to 4 done; Phase 5 in progress (API done; React UI: all six screens built; end-to-end and accessibility tests next); Phase 6 (demo and pitch) after that. This README is updated as each part lands.
+**Status:** Phases 1 to 5 done (audit core, extraction, explainer and letter, multilingual Q&A, API and React UI). Phase 6 (demo cases, eval dashboard, pitch) is next.
 
 ## Principles
 
@@ -29,7 +29,7 @@ errors with evidence, ask questions in your own language, and generate a dispute
 | 3 | Explainer with validator and template fallback, dispute letter (text and PDF) | `explain/` |
 | 4 | Number-integrity placeholder layer, per-language glossaries (Spanish, Mongolian), translator with token/glossary checks and a back-translation check, offline translation cache, letter translation for side-by-side display (English is always the version to send), 20-question-per-language evaluation, grounded multilingual Q&A (intent routing, case-only retrieval with citations, deferral and medical/legal redirects) | `i18n/` |
 
-| 5 (partial) | FastAPI app: upload and extract, correct lines, confirm, audit, ask, letter (PDF, text, side-by-side JSON), source page images, delete with TTL cleanup, SSE progress, `DEMO_MODE`, committed sample cases | `api/`, `data/samples/` |
+| 5 | FastAPI app (upload and extract, correct lines, confirm, audit, ask, letter, source page images, delete with TTL cleanup, SSE progress, `DEMO_MODE`, committed sample cases) and a React + Vite + TypeScript + Tailwind UI with six screens: language and welcome, upload, review, results, ask, letter | `api/`, `web/`, `data/samples/` |
 
 Rules (one file each in `audit/rules/`, auto-registered): duplicate charge, unbundling (NCCI), excess units (MUE),
 EOB mismatch and balance billing, missing EOB line, price outlier (Medicare fee schedule, always `ask`), balance arithmetic.
@@ -57,6 +57,19 @@ uvicorn api.main:app_factory --factory --port 8000               # live; uses AN
 | `DELETE /cases/{id}` | Wipe the case. Cases also expire after `CASE_TTL_SECONDS` (default 2 hours). Nothing is written to disk |
 
 With no `ANTHROPIC_API_KEY`: PDFs are read by the text-layer extractor, sample cases replay their stored extraction, explanations use the deterministic templates, and photo uploads return a plain message suggesting a PDF or manual entry. In `DEMO_MODE` the model is never called.
+
+## Running the web app
+
+```bash
+# terminal 1: the API (DEMO_MODE=1 for the offline demo)
+cd medbill && DEMO_MODE=1 uvicorn api.main:app_factory --factory --port 8000
+# terminal 2: the UI
+cd medbill/web && npm install && npm run dev      # http://127.0.0.1:5173 (proxies /api to :8000)
+```
+
+The six screens: language picker and welcome; upload (two drop zones, camera capture on phones, example cases); review (editable lines, yellow cells for low-confidence fields, the page image with the selected row outlined, and a **Looks right, continue** button the audit waits for); results (headline total, tier badges *Definite / Likely / Worth asking*, an evidence button that highlights the exact source lines on the bill and the EOB, or a calm *No errors found* with what was checked); ask (chat in the chosen language, suggested questions, microphone dictation and read-aloud where the browser supports the language, citations that jump to the evidence); letter (English next to the translation, name, address and account fields, copy, PDF and text download).
+
+Accessibility choices: 18px base type, high contrast, one primary action per screen, keyboard navigable with a skip link and focus moved to each screen's heading, ARIA labels and live regions, reduced-motion respected, works at 375px width, plain error messages with a manual-entry fallback, and loading states that always show progress text. Interface text for Spanish and Mongolian is a **draft that needs native review**. Browsers have few Mongolian voices, so dictation and read-aloud say so instead of failing.
 
 ## Setup
 
@@ -88,6 +101,7 @@ make test
 | `make test` | Unit tests (no network; LLM calls are mocked) |
 | `make lint` | ruff |
 | `make data` | Generate 20 synthetic bills and EOBs (PDF and phone-photo JPEG) with ground truth into `data/synthetic/` |
+| `make web-test` | Playwright end-to-end and axe tests (starts the API in `DEMO_MODE` and the dev server itself) |
 | `make eval` | Run all evaluation scripts (audit, extraction, explainer, multilingual); each prints PASS or FAIL, and says whether it used a live model or an offline stand-in |
 
 ## CMS data and licensing
@@ -117,6 +131,10 @@ not redistributed here.
 Q&A: questions are translated to English (numbers placeholdered), routed to one of six supported answer types or a glossary-term definition, and answered from the case data only. Anything else, including coverage and personal-plan questions ("will my insurance cover...", "what is my deductible"), gets a fixed deferral phrase pointing to the billing office; medical and legal questions get a fixed redirect. Without a model, Spanish and Mongolian questions are still routed by keyword hints in the glossary files, and the answer is shown in English with a notice.
 
 Translation safety (unit-tested with deliberately corrupted numbers): the model only sees placeholder tokens, never raw amounts, codes or dates; dropped, duplicated, invented or mangled tokens and stray digits are rejected, then a back-translation to English must carry the same multiset of numbers and codes. On failure it retries once, then shows the English text with a notice. Known limit: two amounts swapped in position keep the same multiset, so that case is not detectable.
+
+| Web app end-to-end (Playwright, 10 tests at desktop and at 375px width) | 20/20 pass: the $412.00 headline and three cards, evidence highlight on the bill and EOB, grounded answer and deferral, letter total and PDF, clean case, careful-wording case, Spanish flow, uploads, delete-my-data, keyboard and skip link, no horizontal overflow |
+| Accessibility (axe-core, WCAG 2 A and AA, all six screens) | 0 critical or serious violations. This is an automated check, not a full accessibility audit |
+| Time from upload to findings | Instant in `DEMO_MODE` (stored extraction). The 20-second live target is **not measured** because there is no API key here |
 
 Honest caveats: the clean-PDF number comes from PDFs our own generator made. The explainer eval uses an offline
 stand-in unless `ANTHROPIC_API_KEY` is set, so it tests the validator, not model quality. Spanish and Mongolian

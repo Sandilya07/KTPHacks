@@ -48,7 +48,7 @@ export default function DocViewer({ s, kase, highlight, className = '' }: Props)
           </button>
         ))}
       </div>
-      <div id="doc-panel" role="tabpanel" aria-labelledby={`tab-${doc}`} className="max-h-[70vh] overflow-auto rounded-lg border border-slate-300 bg-slate-100">
+      <div id="doc-panel" role="tabpanel" aria-labelledby={`tab-${doc}`} tabIndex={0} className="max-h-[70vh] overflow-auto rounded-lg border border-slate-300 bg-slate-100">
         {dims.length === 0 && <p className="p-4">{s.noPreview}</p>}
         {dims.map((dim, page) => (
           <div key={page} className="relative" style={{ aspectRatio: `${dim.width} / ${dim.height}` }}>

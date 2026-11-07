@@ -5,15 +5,15 @@ import { listen, recognitionSupported, speak } from '../components/voice'
 import { t, type Strings } from '../strings'
 import type { AskResult, AuditResult, CaseView, Config, Highlight } from '../types'
 
-interface Msg { role: 'user' | 'assistant'; text: string; result?: AskResult; lang: string }
+export interface Msg { role: 'user' | 'assistant'; text: string; result?: AskResult; lang: string }
 interface Props {
   s: Strings; config: Config; lang: string; kase: CaseView; audit: AuditResult | null
+  msgs: Msg[]; setMsgs: React.Dispatch<React.SetStateAction<Msg[]>> // kept by the App so history survives a jump to the evidence
   onJump: (h: Highlight) => void; onLetter: () => void; onBack: () => void
 }
 
-export default function Ask({ s, config, lang, kase, audit, onJump, onLetter, onBack }: Props) {
+export default function Ask({ s, config, lang, kase, audit, msgs, setMsgs, onJump, onLetter, onBack }: Props) {
   const [askLang, setAskLang] = useState(lang)
-  const [msgs, setMsgs] = useState<Msg[]>([])
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -70,7 +70,7 @@ export default function Ask({ s, config, lang, kase, audit, onJump, onLetter, on
             {suggestions.map((q) => <button key={q} type="button" className="btn-secondary min-h-11 text-base" lang={askLang} onClick={() => void send(q)}>{q}</button>)}
           </div>
         </div>
-        <div role="log" aria-live="polite" aria-label={s.askTitle} className="max-h-[50vh] min-h-24 space-y-3 overflow-auto rounded-xl bg-slate-50 p-3" data-testid="chat-log">
+        <div role="log" aria-live="polite" aria-label={s.askTitle} tabIndex={0} className="max-h-[50vh] min-h-24 space-y-3 overflow-auto rounded-xl bg-slate-50 p-3" data-testid="chat-log">
           {msgs.map((m, i) => (
             <div key={i} className={m.role === 'user' ? 'ms-8 rounded-xl bg-blue-100 p-3' : 'me-8 rounded-xl border border-slate-300 bg-white p-3'} data-testid={`msg-${m.role}`}>
               <p className="text-sm font-semibold text-slate-700">{m.role === 'user' ? s.you : s.assistant}</p>
@@ -82,7 +82,7 @@ export default function Ask({ s, config, lang, kase, audit, onJump, onLetter, on
                   <span className="text-base font-semibold">{s.citations}:</span>
                   {[...new Set(m.result.citations)].slice(0, 8).map((c) => {
                     const { label, ids } = cite(c)
-                    return <button key={c} type="button" className="btn-secondary min-h-10 px-3 text-base" onClick={() => onJump({ ids, nonce: Date.now() })}>{label}</button>
+                    return <button key={c} type="button" data-testid="citation" className="btn-secondary min-h-10 px-3 text-base" onClick={() => onJump({ ids, nonce: Date.now() })}>{label}</button>
                   })}
                 </div>
               )}
