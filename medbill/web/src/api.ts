@@ -56,3 +56,12 @@ export const letterUrl = (id: string, p: Record<string, string>) => `${BASE}/cas
 export const getLetter = (id: string, p: Record<string, string>) => fetch(letterUrl(id, { ...p, format: 'json' })).then((r) => json<LetterResult>(r))
 export const sourceUrl = (id: string, doc: string, page: number) => `${BASE}/cases/${id}/source/${page}?doc=${doc}`
 export const deleteCase = (id: string) => fetch(`${BASE}/cases/${id}`, { method: 'DELETE' }).catch(() => undefined)
+
+export function createManual() {
+  const today = new Date().toISOString().slice(0, 10)
+  const body = {
+    bill: { patient_balance: 0, lines: [{ id: 'B1', date: today, code: '', billed: 0, patient_owed: 0 }] },
+    eob: { lines: [{ id: 'E1', date: today, code: '', allowed: 0, plan_paid: 0, patient_resp: 0 }] },
+  }
+  return fetch(`${BASE}/cases/manual`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => json<CaseView>(r))
+}

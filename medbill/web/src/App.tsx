@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { deleteCase, getConfig } from './api'
+import { createManual, deleteCase, getConfig } from './api'
 import { Banner, ErrorBox, Screen, Spinner, Stepper } from './components/Chrome'
+import Review from './screens/Review'
 import Upload from './screens/Upload'
 import Welcome from './screens/Welcome'
 import { t } from './strings'
@@ -37,8 +38,9 @@ export default function App() {
         {configError && <Screen title={s.errorTitle}><ErrorBox s={s} message={configError} onRetry={() => location.reload()} /></Screen>}
         {!config && !configError && <Screen title={s.appName}><Spinner message={s.loading} /></Screen>}
         {config && step === 0 && <Welcome s={s} config={config} lang={lang} setLang={setLang} onStart={() => setStep(1)} />}
-        {config && step === 1 && <Upload s={s} config={config} onCase={(c) => { setCase(c); setStep(2) }} onBack={() => setStep(0)} onManual={() => setStep(2)} />}
-        {config && step === 2 && <Screen title={s.reviewTitle}><p>{kase?.case_id}</p></Screen>}
+        {config && step === 1 && <Upload s={s} config={config} onCase={(c) => { setCase(c); setStep(2) }} onBack={() => setStep(0)} onManual={() => createManual().then((c) => { setCase(c); setStep(2) })} />}
+        {config && step === 2 && kase && <Review key={kase.case_id} s={s} kase={kase} onConfirmed={(c) => { setCase(c); setStep(3) }} onBack={() => setStep(1)} />}
+        {config && step === 3 && <Screen title={s.resultsTitle}><p>{kase?.case_id}</p></Screen>}
       </main>
     </>
   )
