@@ -12,7 +12,7 @@ const TIER_STYLE = {
 } as const
 
 interface Props {
-  s: Strings; lang: string; kase: CaseView; audit: AuditResult | null; setAudit: (a: AuditResult) => void
+  s: Strings; lang: string; kase: CaseView; audit: AuditResult | null; auditKey: string; setAudit: (a: AuditResult, key: string) => void
   highlight: Highlight; setHighlight: (h: Highlight) => void; onAsk: () => void; onLetter: () => void; onBack: () => void
 }
 
@@ -47,16 +47,18 @@ function FindingCard({ s, f, active, onEvidence }: { s: Strings; f: Finding; act
   )
 }
 
-export default function Results({ s, lang, kase, audit, setAudit, highlight, setHighlight, onAsk, onLetter, onBack }: Props) {
+export default function Results({ s, lang, kase, audit, auditKey, setAudit, highlight, setHighlight, onAsk, onLetter, onBack }: Props) {
   const [busy, setBusy] = useState('')
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
 
+  const key = `${kase.case_id}:${lang}`
   useEffect(() => {
+    if (audit && auditKey === key && attempt === 0) return // already audited this case in this language
     let live = true
     setBusy(s.progress.rules); setError('')
     runAudit(kase.case_id, lang, (m) => live && setBusy(m.startsWith('Writing') ? s.progress.explaining : s.progress.rules))
-      .then((a) => { if (live) { setAudit(a); setBusy('') } })
+      .then((a) => { if (live) { setAudit(a, key); setBusy('') } })
       .catch((e: Error) => { if (live) { setError(e.message); setBusy('') } })
     return () => { live = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps

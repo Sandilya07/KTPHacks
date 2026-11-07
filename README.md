@@ -5,7 +5,7 @@ errors with evidence, ask questions in your own language, and generate a dispute
 
 > Informational only. Not legal or medical advice. **Synthetic data only: never use real patient information.**
 
-**Status:** Phases 1 to 4 done; Phase 5 in progress (API done; React UI: welcome, upload, review and results screens built; ask and letter next); Phase 6 (demo and pitch) after that. This README is updated as each part lands.
+**Status:** Phases 1 to 4 done; Phase 5 in progress (API done; React UI: welcome, upload, review, results and ask screens built; letter next); Phase 6 (demo and pitch) after that. This README is updated as each part lands.
 
 ## Principles
 

@@ -85,6 +85,7 @@ const en = {
   errorTitle: 'Something needs your attention',
   manualTitle: 'Enter the lines by hand',
   startManual: 'Enter lines by hand',
+  suggestedList: ['What does this charge mean?', 'Why was I charged twice?', 'How much do I actually owe?', 'What should I say when I call billing?', 'What is an EOB?', 'What happens next?'],
   progress: { reading: 'Reading your bill', checking_lines: 'Checking the lines we read', rules: 'Checking billing rules', explaining: 'Writing explanations' },
 }
 export type Strings = typeof en
@@ -174,6 +175,7 @@ const es: Strings = {
   errorTitle: 'Algo necesita su atención',
   manualTitle: 'Ingrese las líneas a mano',
   startManual: 'Ingresar líneas a mano',
+  suggestedList: ['¿Qué significa este cargo?', '¿Por qué me cobraron dos veces?', '¿Cuánto debo realmente?', '¿Qué debo decir cuando llame a facturación?', '¿Qué es un EOB?', '¿Qué pasa después?'],
   progress: { reading: 'Leyendo su factura', checking_lines: 'Revisando las líneas que leímos', rules: 'Revisando las reglas de facturación', explaining: 'Escribiendo explicaciones' },
 }
 
@@ -262,6 +264,7 @@ const mn: Strings = {
   errorTitle: 'Анхаарах зүйл гарлаа',
   manualTitle: 'Мөрүүдийг гараар оруулах',
   startManual: 'Мөрийг гараар оруулах',
+  suggestedList: ['Энэ төлбөр юу гэсэн үг вэ?', 'Яагаад надаас хоёр удаа авсан бэ?', 'Би үнэндээ хэдийг төлөх ёстой вэ?', 'Нэхэмжлэхийн алба руу залгахдаа юу гэж хэлэх вэ?', 'EOB гэж юу вэ?', 'Дараа нь юу болох вэ?'],
   progress: { reading: 'Нэхэмжлэхийг тань уншиж байна', checking_lines: 'Уншсан мөрүүдийг шалгаж байна', rules: 'Нэхэмжлэхийн дүрмийг шалгаж байна', explaining: 'Тайлбар бичиж байна' },
 }
 
