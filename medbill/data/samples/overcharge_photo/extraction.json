@@ -1,0 +1,236 @@
+{
+ "bill": {
+  "provider": "Synthetic Family Clinic",
+  "account_number": "ACCT-0001",
+  "patient_balance": 502.0,
+  "lines": [
+   {
+    "date": "2024-03-05",
+    "code": "99213",
+    "modifiers": [],
+    "description": "Office visit",
+    "units": 1,
+    "billed": 150.0,
+    "patient_owed": 30.0,
+    "page": 0,
+    "bbox": [
+     158.72057996961848,
+     316.8984418751767,
+     1040.525365601433,
+     380.0797248589229
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "80053",
+    "modifiers": [],
+    "description": "Metabolic panel",
+    "units": 1,
+    "billed": 95.0,
+    "patient_owed": 20.0,
+    "page": 0,
+    "bbox": [
+     157.61044718953303,
+     352.9924850248377,
+     1039.4152328213474,
+     416.17376800858386
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "80053",
+    "modifiers": [],
+    "description": "Metabolic panel",
+    "units": 1,
+    "billed": 95.0,
+    "patient_owed": 95.0,
+    "page": 0,
+    "bbox": [
+     156.50031440944758,
+     389.0865281744987,
+     1038.305100041262,
+     452.2678111582449
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "82947",
+    "modifiers": [],
+    "description": "Glucose test",
+    "units": 1,
+    "billed": 110.0,
+    "patient_owed": 110.0,
+    "page": 0,
+    "bbox": [
+     155.39018162936213,
+     425.18057132415976,
+     1037.1949672611765,
+     488.3618543079059
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-04-12",
+    "code": "99214",
+    "modifiers": [],
+    "description": "Office visit, longer",
+    "units": 1,
+    "billed": 400.0,
+    "patient_owed": 247.0,
+    "page": 0,
+    "bbox": [
+     154.28004884927665,
+     461.27461447382075,
+     1036.084834481091,
+     524.455897457567
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.62,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ },
+ "eob": {
+  "payer": "Synthetic Health Plan",
+  "network_status": "in",
+  "total_patient_responsibility": 90.0,
+  "lines": [
+   {
+    "date": "2024-03-05",
+    "code": "99213",
+    "modifiers": [],
+    "allowed": 90.0,
+    "plan_paid": 60.0,
+    "patient_resp": 30.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     206.78004619200445,
+     321.1769234056778,
+     1142.2680927129138,
+     423.39497426507995
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "80053",
+    "modifiers": [],
+    "allowed": 40.0,
+    "plan_paid": 20.0,
+    "patient_resp": 20.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     204.22415799872934,
+     357.1974700592545,
+     1139.7122045196386,
+     459.4155209186565
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "82947",
+    "modifiers": [],
+    "allowed": 0.0,
+    "plan_paid": 0.0,
+    "patient_resp": 0.0,
+    "status": "denied-bundled",
+    "adjustment_reason": "CARC 97",
+    "page": 0,
+    "bbox": [
+     201.66826980545423,
+     393.21801671283106,
+     1137.1563163263636,
+     495.4360675722332
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-04-12",
+    "code": "99214",
+    "modifiers": [],
+    "allowed": 200.0,
+    "plan_paid": 160.0,
+    "patient_resp": 40.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     199.11238161217912,
+     429.23856336640773,
+     1134.6004281330884,
+     531.4566142258097
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ }
+}

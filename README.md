@@ -5,7 +5,7 @@ errors with evidence, ask questions in your own language, and generate a dispute
 
 > Informational only. Not legal or medical advice. **Synthetic data only: never use real patient information.**
 
-**Status:** Phases 1 to 4 done. Phases 5 (API and UI) and 6 (demo and pitch) are next. This README is updated as each part lands.
+**Status:** Phases 1 to 4 done; Phase 5 in progress (API done, React UI next); Phase 6 (demo and pitch) after that. This README is updated as each part lands.
 
 ## Principles
 
@@ -29,8 +29,34 @@ errors with evidence, ask questions in your own language, and generate a dispute
 | 3 | Explainer with validator and template fallback, dispute letter (text and PDF) | `explain/` |
 | 4 | Number-integrity placeholder layer, per-language glossaries (Spanish, Mongolian), translator with token/glossary checks and a back-translation check, offline translation cache, letter translation for side-by-side display (English is always the version to send), 20-question-per-language evaluation, grounded multilingual Q&A (intent routing, case-only retrieval with citations, deferral and medical/legal redirects) | `i18n/` |
 
+| 5 (partial) | FastAPI app: upload and extract, correct lines, confirm, audit, ask, letter (PDF, text, side-by-side JSON), source page images, delete with TTL cleanup, SSE progress, `DEMO_MODE`, committed sample cases | `api/`, `data/samples/` |
+
 Rules (one file each in `audit/rules/`, auto-registered): duplicate charge, unbundling (NCCI), excess units (MUE),
 EOB mismatch and balance billing, missing EOB line, price outlier (Medicare fee schedule, always `ask`), balance arithmetic.
+
+## Running the API
+
+```bash
+cd medbill
+python scripts/make_samples.py          # only needed if data/samples is missing
+DEMO_MODE=1 uvicorn api.main:app_factory --factory --port 8000   # offline demo, no model calls
+uvicorn api.main:app_factory --factory --port 8000               # live; uses ANTHROPIC_API_KEY if set
+```
+
+| Route | Does |
+|---|---|
+| `GET /config` | Languages, samples, suggested questions, whether a model is available |
+| `POST /cases` | Multipart `bill` and `eob` (PDF or photo), or form field `sample=overcharge\|overcharge_photo\|clean\|ask`. Add `?stream=1` for server-sent progress events |
+| `POST /cases/manual` | Manual-entry fallback (JSON bill and EOB) |
+| `PATCH /cases/{id}/lines` | User corrections (edit, add, delete lines; resets confirmation) |
+| `POST /cases/{id}/confirm` | The user confirms the extracted lines. **Audit, ask and letter return 409 until then** |
+| `POST /cases/{id}/audit?lang=` | Findings, total, evidence, explanations (translated through the integrity layer) |
+| `POST /cases/{id}/ask` | `{question, language}`: grounded answer, citations, deferral flag |
+| `GET /cases/{id}/letter?lang=&format=pdf\|txt\|json` | PDF and text are always English; `json` adds the side-by-side translation |
+| `GET /cases/{id}/source/{page}?doc=bill\|eob` | Page image for evidence highlighting |
+| `DELETE /cases/{id}` | Wipe the case. Cases also expire after `CASE_TTL_SECONDS` (default 2 hours). Nothing is written to disk |
+
+With no `ANTHROPIC_API_KEY`: PDFs are read by the text-layer extractor, sample cases replay their stored extraction, explanations use the deterministic templates, and photo uploads return a plain message suggesting a PDF or manual entry. In `DEMO_MODE` the model is never called.
 
 ## Setup
 
@@ -51,6 +77,8 @@ make test
 | `ANTHROPIC_API_KEY` | Enables live model paths (extraction, explanations, translation). Without it everything falls back to deterministic code. |
 | `MODEL` | Model string for all calls (default `claude-sonnet-5-5`). |
 | `PRICE_OUTLIER_MULTIPLE` | Price-outlier threshold over the Medicare fee schedule (default `5`). |
+| `DEMO_MODE` | `1` serves the sample cases from stored extractions and never calls a model. |
+| `CASE_TTL_SECONDS` | How long an idle case is kept in memory (default `7200`). |
 | `CMS_FILES_DIR` | Where downloaded CMS files live (default `audit/cms_data/files`). |
 
 ## Make targets (run from `medbill/`, pass `PY=.venv/bin/python` if needed)

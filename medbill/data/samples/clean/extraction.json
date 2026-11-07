@@ -1,0 +1,114 @@
+{
+ "bill": {
+  "provider": "Synthetic Family Clinic",
+  "account_number": "ACCT-0002",
+  "patient_balance": 40.0,
+  "lines": [
+   {
+    "date": "2024-05-02",
+    "code": "99213",
+    "modifiers": [],
+    "description": "Office visit",
+    "units": 1,
+    "billed": 150.0,
+    "patient_owed": 30.0,
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     518,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-05-02",
+    "code": "85025",
+    "modifiers": [],
+    "description": "Blood count",
+    "units": 1,
+    "billed": 40.0,
+    "patient_owed": 10.0,
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     518,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ },
+ "eob": {
+  "payer": "Synthetic Health Plan",
+  "network_status": "in",
+  "total_patient_responsibility": 40.0,
+  "lines": [
+   {
+    "date": "2024-05-02",
+    "code": "99213",
+    "modifiers": [],
+    "allowed": 90.0,
+    "plan_paid": 60.0,
+    "patient_resp": 30.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     559,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-05-02",
+    "code": "85025",
+    "modifiers": [],
+    "allowed": 25.0,
+    "plan_paid": 15.0,
+    "patient_resp": 10.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     559,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ }
+}

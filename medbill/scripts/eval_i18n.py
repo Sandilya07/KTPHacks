@@ -73,8 +73,7 @@ def main() -> int:
             llm = SimulatedLLM(lang, qs)
         qa = QA(Translator(llm))
         g = load_glossary(lang)
-        keys = ("n grounded answered integrity verified gloss gloss_n defer_ok defer_n intent refs refs_n "
-                "offline fell_back").split()
+        keys = ["n", "grounded", "answered", "integrity", "verified", "gloss", "gloss_n", "defer_ok", "defer_n", "intent", "refs", "refs_n", "offline", "fell_back"]
         m = dict.fromkeys(keys, 0)
         for q in qs:
             r = qa.ask(case, q["q"], lang)

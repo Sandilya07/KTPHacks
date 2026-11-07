@@ -237,13 +237,16 @@ def render_pdf(path: Path, doc: dict, kind: str, layout: dict) -> list[list[floa
 
 
 # --- phone-photo noise -------------------------------------------------------------------------------
-def photo_variant(pdf: Path, out: Path, rng: random.Random) -> None:
+def photo_variant(pdf: Path, out: Path, rng: random.Random) -> dict:
+    """Writes the noisy photo and returns its geometry so PDF-point boxes can be mapped onto it."""
     with pymupdf.open(pdf) as d:
         pix = d[0].get_pixmap(dpi=130)
         img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
     bg = Image.new("RGB", (img.width + 120, img.height + 120), (92, 86, 80))
     bg.paste(img, (60, 60))
-    bg = bg.rotate(rng.uniform(-5, 5), resample=Image.BICUBIC, expand=True, fillcolor=(92, 86, 80))
+    angle, size0 = rng.uniform(-5, 5), bg.size
+    bg = bg.rotate(angle, resample=Image.BICUBIC, expand=True, fillcolor=(92, 86, 80))
+    geometry = {"angle": angle, "size0": size0, "size1": bg.size, "scale": 130 / 72, "pad": 60}
     bg = bg.filter(ImageFilter.GaussianBlur(rng.uniform(0.7, 1.3)))
     # shadow gradient across the page
     w, h = bg.size
@@ -254,6 +257,20 @@ def photo_variant(pdf: Path, out: Path, rng: random.Random) -> None:
     buf = io.BytesIO()
     bg.save(buf, format="JPEG", quality=rng.randint(45, 65))
     out.write_bytes(buf.getvalue())
+    return geometry
+
+
+def map_bbox(bbox, g: dict) -> list[float]:
+    """Map a box from PDF points to the photo's pixel coordinates (axis-aligned bounds of the rotated box)."""
+    import math
+    a = math.radians(g["angle"])
+    (w0, h0), (w1, h1) = g["size0"], g["size1"]
+    xs, ys = [], []
+    for x, y in ((bbox[0], bbox[1]), (bbox[2], bbox[1]), (bbox[2], bbox[3]), (bbox[0], bbox[3])):
+        px, py = x * g["scale"] + g["pad"] - w0 / 2, y * g["scale"] + g["pad"] - h0 / 2
+        xs.append(w1 / 2 + math.cos(a) * px + math.sin(a) * py)
+        ys.append(h1 / 2 - math.sin(a) * px + math.cos(a) * py)
+    return [min(xs), min(ys), max(xs), max(ys)]
 
 
 def main() -> None:

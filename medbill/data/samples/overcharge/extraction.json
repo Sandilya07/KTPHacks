@@ -1,0 +1,236 @@
+{
+ "bill": {
+  "provider": "Synthetic Family Clinic",
+  "account_number": "ACCT-0001",
+  "patient_balance": 502.0,
+  "lines": [
+   {
+    "date": "2024-03-05",
+    "code": "99213",
+    "modifiers": [],
+    "description": "Office visit",
+    "units": 1,
+    "billed": 150.0,
+    "patient_owed": 30.0,
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     522,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "80053",
+    "modifiers": [],
+    "description": "Metabolic panel",
+    "units": 1,
+    "billed": 95.0,
+    "patient_owed": 20.0,
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     522,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "80053",
+    "modifiers": [],
+    "description": "Metabolic panel",
+    "units": 1,
+    "billed": 95.0,
+    "patient_owed": 95.0,
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     522,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "82947",
+    "modifiers": [],
+    "description": "Glucose test",
+    "units": 1,
+    "billed": 110.0,
+    "patient_owed": 110.0,
+    "page": 0,
+    "bbox": [
+     34,
+     200,
+     522,
+     220
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-04-12",
+    "code": "99214",
+    "modifiers": [],
+    "description": "Office visit, longer",
+    "units": 1,
+    "billed": 400.0,
+    "patient_owed": 247.0,
+    "page": 0,
+    "bbox": [
+     34,
+     220,
+     522,
+     240
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ },
+ "eob": {
+  "payer": "Synthetic Health Plan",
+  "network_status": "in",
+  "total_patient_responsibility": 90.0,
+  "lines": [
+   {
+    "date": "2024-03-05",
+    "code": "99213",
+    "modifiers": [],
+    "allowed": 90.0,
+    "plan_paid": 60.0,
+    "patient_resp": 30.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     552,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "80053",
+    "modifiers": [],
+    "allowed": 40.0,
+    "plan_paid": 20.0,
+    "patient_resp": 20.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     552,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-03-05",
+    "code": "82947",
+    "modifiers": [],
+    "allowed": 0.0,
+    "plan_paid": 0.0,
+    "patient_resp": 0.0,
+    "status": "denied-bundled",
+    "adjustment_reason": "CARC 97",
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     552,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2024-04-12",
+    "code": "99214",
+    "modifiers": [],
+    "allowed": 200.0,
+    "plan_paid": 160.0,
+    "patient_resp": 40.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     200,
+     552,
+     220
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ }
+}
