@@ -39,3 +39,11 @@ def test_load_from_dir_and_manifest_fallback(tmp_path):
     assert d.source == "cms" and len(d.ncci) == 3 and "99213" in d.mue
     assert load_cms_data(tmp_path / "empty").source == "sample"
     assert sample_cms_data().source == "sample"
+
+
+def test_partial_data_falls_back_per_dataset(tmp_path):
+    (tmp_path / "mue_practitioner").mkdir()
+    (tmp_path / "mue_practitioner" / "m.csv").write_text(MUE)
+    d = load_cms_data(tmp_path)
+    assert d.parts == {"ncci": "sample", "mue": "cms", "pfs": "none"}
+    assert d.ncci.lookup("80053", "82947", "2024-03-05") is not None  # sample pair still available

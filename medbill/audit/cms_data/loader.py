@@ -64,7 +64,8 @@ class CmsData:
     ncci: NcciTable = field(default_factory=NcciTable)
     mue: dict[str, MueEntry] = field(default_factory=dict)
     pfs: dict[str, float] = field(default_factory=dict)
-    source: str = "sample"  # "cms" or "sample"
+    source: str = "sample"  # "cms" if any real CMS file was loaded, else "sample"
+    parts: dict[str, str] = field(default_factory=dict)  # per dataset: "cms" or "sample"
     manifest: dict = field(default_factory=dict)
 
 
@@ -108,11 +109,17 @@ def parse_pfs(text: str, out: dict[str, float] | None = None) -> dict[str, float
     header = next((i for i, r in enumerate(rows) if "HCPCS" in [c.strip().upper() for c in r]), None)
     if header is None:
         return out
-    names = [c.strip().upper() for c in rows[header]]
+    # The real file splits column titles over several rows ("NON-FACILITY" / "TOTAL"): join them.
+    names = []
+    for i in range(len(rows[header])):
+        parts = [rows[r][i].strip().upper() for r in range(max(0, header - 3), header + 1)
+                 if i < len(rows[r]) and rows[r][i].strip()]
+        names.append(" ".join(parts))
     ix = {n: i for i, n in enumerate(names)}
-    nonfac = next((i for n, i in ix.items() if n.startswith("NON-FAC") and "TOTAL" in n), None)
+    nonfac = next((i for n, i in ix.items()
+                   if "NON-FAC" in n and n.endswith("TOTAL") and "PE" not in n.split()), None)
     cf = next((i for n, i in ix.items() if "CONV" in n), None)
-    mod = ix.get("MOD")
+    mod = next((i for n, i in ix.items() if n == "MOD"), None)
     if nonfac is None or cf is None:
         return out
     for r in rows[header + 1:]:
@@ -145,14 +152,22 @@ def load_cms_data(files_dir: Path | None = None) -> CmsData:
         parse_mue(_read(p), data.mue)
     for p in sorted(files_dir.glob("pfs/**/PPRRVU*.csv")) + sorted(files_dir.glob("pfs/**/pprrvu*.csv")):
         parse_pfs(_read(p), data.pfs)
-    if not len(data.ncci) and not data.mue:
-        return sample_cms_data()
+    sample = sample_cms_data()
+    data.parts = {"ncci": "cms" if len(data.ncci) else "sample",
+                  "mue": "cms" if data.mue else "sample",
+                  "pfs": "cms" if data.pfs else "none"}
+    if not len(data.ncci):  # e.g. NCCI is behind the AMA license gate and was not downloaded
+        data.ncci = sample.ncci
+    if not data.mue:
+        data.mue = sample.mue
+    if "cms" not in data.parts.values():
+        return sample
     return data
 
 
 def sample_cms_data() -> CmsData:
     """Illustrative sample only (documented fallback). Not a substitute for the real files."""
-    d = CmsData(source="sample")
+    d = CmsData(source="sample", parts={"ncci": "sample", "mue": "sample", "pfs": "none"})
     d.ncci.add("80053", "82947", NcciEdit("1996-01-01", None, "1"))
     d.ncci.add("80053", "82565", NcciEdit("1996-01-01", None, "1"))
     for code in ("99213", "99214", "80053", "85025", "82947"):

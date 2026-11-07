@@ -1,0 +1,54 @@
+{
+  "quarter": "2026Q4",
+  "downloaded": "2026-11-07",
+  "datasets": {
+    "mue_practitioner": {
+      "source_page": "https://www.cms.gov/medicare/coding-billing/national-correct-coding-initiative-ncci-edits/medicare-ncci-medically-unlikely-edits",
+      "source_urls": [
+        "https://www.cms.gov/files/zip/medicare-ncci-2026-q4-practitioner-services-mue-table.zip"
+      ],
+      "files": [
+        "audit/cms_data/files/mue_practitioner/MCR_MUE_PractitionerServices_Eff_10-01-2026.xlsx",
+        "audit/cms_data/files/mue_practitioner/MCR_MUE_PractitionerServices_Eff_10-01-2026.csv"
+      ]
+    },
+    "mue_outpatient": {
+      "source_page": "https://www.cms.gov/medicare/coding-billing/national-correct-coding-initiative-ncci-edits/medicare-ncci-medically-unlikely-edits",
+      "source_urls": [
+        "https://www.cms.gov/files/zip/medicare-ncci-2026-q4-facility-outpatient-hospital-services-mue-table.zip"
+      ],
+      "files": [
+        "audit/cms_data/files/mue_outpatient/MCR_MUE_OutpatientHospitalServices_Eff_10-01-2026.xlsx",
+        "audit/cms_data/files/mue_outpatient/MCR_MUE_OutpatientHospitalServices_Eff_10-01-2026.csv"
+      ]
+    },
+    "pfs": {
+      "source_page": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26d",
+      "source_urls": [
+        "https://www.cms.gov/files/zip/rvu26d-updated-08-26-2026.zip"
+      ],
+      "files": [
+        "audit/cms_data/files/pfs/GPCI2026.csv",
+        "audit/cms_data/files/pfs/GPCI2026.txt",
+        "audit/cms_data/files/pfs/GPCI2026.xlsx",
+        "audit/cms_data/files/pfs/OPPSCAP_Oct.csv",
+        "audit/cms_data/files/pfs/OPPSCAP_Oct.txt",
+        "audit/cms_data/files/pfs/OPPSCAP_Oct.xlsx",
+        "audit/cms_data/files/pfs/PPRRVU2026_Oct_nonQPP.csv",
+        "audit/cms_data/files/pfs/PPRRVU2026_Oct_nonQPP.txt",
+        "audit/cms_data/files/pfs/PPRRVU2026_Oct_nonQPP.xlsx",
+        "audit/cms_data/files/pfs/PPRRVU2026_Oct_QPP.csv",
+        "audit/cms_data/files/pfs/PPRRVU2026_Oct_QPP.txt",
+        "audit/cms_data/files/pfs/PPRRVU2026_Oct_QPP.xlsx",
+        "audit/cms_data/files/pfs/RVU26D.pdf",
+        "audit/cms_data/files/pfs/26LOCCO.csv",
+        "audit/cms_data/files/pfs/26LOCCO.txt",
+        "audit/cms_data/files/pfs/26LOCCO.xlsx",
+        "audit/cms_data/files/pfs/ANES2026.csv",
+        "audit/cms_data/files/pfs/ANES2026.txt",
+        "audit/cms_data/files/pfs/ANES2026.xlsx"
+      ]
+    },
+    "ncci_note": "NCCI PTP files not fetched: AMA license not accepted via this script. Place manually downloaded files in files/ncci_practitioner/."
+  }
+}

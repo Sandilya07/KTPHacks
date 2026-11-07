@@ -1,0 +1,10 @@
+{
+  "quarter": "2026Q4",
+  "quarter_slug": "2026-q4",
+  "pages": {
+    "ncci": "https://www.cms.gov/medicare/coding-billing/national-correct-coding-initiative-ncci-edits/medicare-ncci-procedure-procedure-ptp-edits",
+    "mue": "https://www.cms.gov/medicare/coding-billing/national-correct-coding-initiative-ncci-edits/medicare-ncci-medically-unlikely-edits",
+    "pfs": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26d"
+  },
+  "manual_folder": "audit/cms_data/files/manual_download"
+}
