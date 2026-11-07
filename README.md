@@ -28,7 +28,7 @@ are next. This README is updated as each part lands.
 | 1 | Deterministic audit core | `medbill/audit/` |
 | 2 | Pydantic models, rule registry, CMS data loaders, extraction pipeline, synthetic data and evals | `audit/`, `extraction/`, `scripts/` |
 | 3 | Explainer with validator and template fallback, dispute letter (text and PDF) | `explain/` |
-| 4 (partial) | Number-integrity placeholder layer, per-language glossaries (Spanish, Mongolian) | `i18n/` |
+| 4 (partial) | Number-integrity placeholder layer, per-language glossaries (Spanish, Mongolian), translator with token/glossary checks and a back-translation check, offline translation cache | `i18n/` |
 
 Rules (one file each in `audit/rules/`, auto-registered): duplicate charge, unbundling (NCCI), excess units (MUE),
 EOB mismatch and balance billing, missing EOB line, price outlier (Medicare fee schedule, always `ask`), balance arithmetic.
@@ -85,6 +85,8 @@ not redistributed here.
 | Clean-PDF extraction (text-layer extractor) | 100% field accuracy |
 | Photo extraction | **not measured** (needs `ANTHROPIC_API_KEY` and the vision model) |
 | Explainer validator, 20 findings, simulated LLM | 0 accepted texts with an invented number, code or banned word; template fallback fires on a fixed schedule to prove the safety net |
+
+Translation safety (unit-tested with deliberately corrupted numbers): the model only sees placeholder tokens, never raw amounts, codes or dates; dropped, duplicated, invented or mangled tokens and stray digits are rejected, then a back-translation to English must carry the same multiset of numbers and codes. On failure it retries once, then shows the English text with a notice. Known limit: two amounts swapped in position keep the same multiset, so that case is not detectable.
 
 Honest caveats: the clean-PDF number comes from PDFs our own generator made. The explainer eval uses an offline
 stand-in unless `ANTHROPIC_API_KEY` is set, so it tests the validator, not model quality. Spanish and Mongolian
