@@ -1,0 +1,152 @@
+[
+ {
+  "q": "¿Qué significa el código 99214?",
+  "en": "What does code 99214 mean?",
+  "intent": "charge_meaning",
+  "answerable": true,
+  "refs": [
+   "B5"
+  ]
+ },
+ {
+  "q": "¿Qué significa el cargo del código 82947?",
+  "en": "What does the charge for code 82947 mean?",
+  "intent": "charge_meaning",
+  "answerable": true,
+  "refs": [
+   "B4"
+  ]
+ },
+ {
+  "q": "¿Qué significa este cargo?",
+  "en": "What does this charge mean?",
+  "intent": "charge_meaning",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Por qué me cobraron dos veces?",
+  "en": "Why was I charged twice?",
+  "intent": "charged_twice",
+  "answerable": true,
+  "refs": [
+   "B3"
+  ]
+ },
+ {
+  "q": "¿Por qué aparece dos veces el código 80053?",
+  "en": "Why does code 80053 appear twice?",
+  "intent": "charged_twice",
+  "answerable": true,
+  "refs": [
+   "B3"
+  ]
+ },
+ {
+  "q": "¿Me cobraron doble por el análisis de sangre?",
+  "en": "Was I charged double for the blood test?",
+  "intent": "charged_twice",
+  "answerable": true,
+  "refs": [
+   "B3"
+  ]
+ },
+ {
+  "q": "¿Cuánto debo realmente?",
+  "en": "How much do I actually owe?",
+  "intent": "how_much_owe",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Cuánto tengo que pagar en total?",
+  "en": "How much do I have to pay in total?",
+  "intent": "how_much_owe",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Cuál es el monto total adeudado?",
+  "en": "What is the total amount due?",
+  "intent": "how_much_owe",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Qué debo decir cuando llame a facturación?",
+  "en": "What should I say when I call billing?",
+  "intent": "what_to_say",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Qué le digo a la oficina de facturación por teléfono?",
+  "en": "What should I say to the billing office on the phone?",
+  "intent": "what_to_say",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Qué es un EOB?",
+  "en": "What is an EOB?",
+  "intent": "what_is_eob",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Qué significa explicación de beneficios?",
+  "en": "What does explanation of benefits mean?",
+  "intent": "what_is_eob",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Qué pasa después?",
+  "en": "What happens next?",
+  "intent": "what_happens_next",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Cuáles son los próximos pasos?",
+  "en": "What are the next steps?",
+  "intent": "what_happens_next",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "¿Mi seguro cubrirá una cirugía futura?",
+  "en": "Will my insurance cover a future surgery?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ },
+ {
+  "q": "¿Cuál es mi deducible?",
+  "en": "What is my deductible?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ },
+ {
+  "q": "¿Este médico estará dentro de la red el próximo año?",
+  "en": "Will this doctor be in network next year?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ },
+ {
+  "q": "¿Cuál es el número de mi póliza?",
+  "en": "What is my policy number?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ },
+ {
+  "q": "¿Quién es el dueño de la clínica?",
+  "en": "Who owns the clinic?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ }
+]

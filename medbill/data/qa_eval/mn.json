@@ -1,0 +1,152 @@
+[
+ {
+  "q": "99214 кодын утга юу вэ?",
+  "en": "What does code 99214 mean?",
+  "intent": "charge_meaning",
+  "answerable": true,
+  "refs": [
+   "B5"
+  ]
+ },
+ {
+  "q": "82947 кодтой төлбөр юу гэсэн үг вэ?",
+  "en": "What does the charge for code 82947 mean?",
+  "intent": "charge_meaning",
+  "answerable": true,
+  "refs": [
+   "B4"
+  ]
+ },
+ {
+  "q": "Энэ төлбөр юу гэсэн үг вэ?",
+  "en": "What does this charge mean?",
+  "intent": "charge_meaning",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Яагаад надаас хоёр удаа авсан бэ?",
+  "en": "Why was I charged twice?",
+  "intent": "charged_twice",
+  "answerable": true,
+  "refs": [
+   "B3"
+  ]
+ },
+ {
+  "q": "80053 код яагаад хоёр удаа гарсан бэ?",
+  "en": "Why does code 80053 appear twice?",
+  "intent": "charged_twice",
+  "answerable": true,
+  "refs": [
+   "B3"
+  ]
+ },
+ {
+  "q": "Цусны шинжилгээний төлбөрийг давхар авсан уу?",
+  "en": "Was I charged double for the blood test?",
+  "intent": "charged_twice",
+  "answerable": true,
+  "refs": [
+   "B3"
+  ]
+ },
+ {
+  "q": "Би үнэндээ хэдийг төлөх ёстой вэ?",
+  "en": "How much do I actually owe?",
+  "intent": "how_much_owe",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Нийт хэдийг төлөх ёстой вэ?",
+  "en": "How much do I have to pay in total?",
+  "intent": "how_much_owe",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Нийт төлөх дүн хэд вэ?",
+  "en": "What is the total amount due?",
+  "intent": "how_much_owe",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Нэхэмжлэхийн алба руу залгахдаа юу гэж хэлэх вэ?",
+  "en": "What should I say when I call billing?",
+  "intent": "what_to_say",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Утсаар нэхэмжлэхийн албанд юу гэж хэлэх ёстой вэ?",
+  "en": "What should I say to the billing office on the phone?",
+  "intent": "what_to_say",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "EOB гэж юу вэ?",
+  "en": "What is an EOB?",
+  "intent": "what_is_eob",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Даатгалын мэдэгдэл гэж юу вэ?",
+  "en": "What does explanation of benefits mean?",
+  "intent": "what_is_eob",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Дараа нь юу болох вэ?",
+  "en": "What happens next?",
+  "intent": "what_happens_next",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Дараагийн алхмууд юу вэ?",
+  "en": "What are the next steps?",
+  "intent": "what_happens_next",
+  "answerable": true,
+  "refs": []
+ },
+ {
+  "q": "Миний даатгал ирэх оны мэс засал хамруулах уу?",
+  "en": "Will my insurance cover a future surgery?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ },
+ {
+  "q": "Миний хасагдах дүн хэд вэ?",
+  "en": "What is my deductible?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ },
+ {
+  "q": "Энэ эмч ирэх жил сүлжээнд байх уу?",
+  "en": "Will this doctor be in network next year?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ },
+ {
+  "q": "Миний даатгалын дугаар хэд вэ?",
+  "en": "What is my policy number?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ },
+ {
+  "q": "Энэ клиникийн эзэн хэн бэ?",
+  "en": "Who owns the clinic?",
+  "intent": "defer",
+  "answerable": false,
+  "refs": []
+ }
+]

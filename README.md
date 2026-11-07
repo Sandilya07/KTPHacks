@@ -5,8 +5,7 @@ errors with evidence, ask questions in your own language, and generate a dispute
 
 > Informational only. Not legal or medical advice. **Synthetic data only: never use real patient information.**
 
-**Status:** Phases 1 to 3 done; Phase 4 (multilingual) in progress. Phases 5 (API and UI) and 6 (demo and pitch)
-are next. This README is updated as each part lands.
+**Status:** Phases 1 to 4 done. Phases 5 (API and UI) and 6 (demo and pitch) are next. This README is updated as each part lands.
 
 ## Principles
 
@@ -28,7 +27,7 @@ are next. This README is updated as each part lands.
 | 1 | Deterministic audit core | `medbill/audit/` |
 | 2 | Pydantic models, rule registry, CMS data loaders, extraction pipeline, synthetic data and evals | `audit/`, `extraction/`, `scripts/` |
 | 3 | Explainer with validator and template fallback, dispute letter (text and PDF) | `explain/` |
-| 4 (partial) | Number-integrity placeholder layer, per-language glossaries (Spanish, Mongolian), translator with token/glossary checks and a back-translation check, offline translation cache, grounded multilingual Q&A (intent routing, case-only retrieval with citations, deferral and medical/legal redirects) | `i18n/` |
+| 4 | Number-integrity placeholder layer, per-language glossaries (Spanish, Mongolian), translator with token/glossary checks and a back-translation check, offline translation cache, letter translation for side-by-side display (English is always the version to send), 20-question-per-language evaluation, grounded multilingual Q&A (intent routing, case-only retrieval with citations, deferral and medical/legal redirects) | `i18n/` |
 
 Rules (one file each in `audit/rules/`, auto-registered): duplicate charge, unbundling (NCCI), excess units (MUE),
 EOB mismatch and balance billing, missing EOB line, price outlier (Medicare fee schedule, always `ask`), balance arithmetic.
@@ -61,7 +60,7 @@ make test
 | `make test` | Unit tests (no network; LLM calls are mocked) |
 | `make lint` | ruff |
 | `make data` | Generate 20 synthetic bills and EOBs (PDF and phone-photo JPEG) with ground truth into `data/synthetic/` |
-| `make eval` | Run the evaluation scripts |
+| `make eval` | Run all evaluation scripts (audit, extraction, explainer, multilingual); each prints PASS or FAIL, and says whether it used a live model or an offline stand-in |
 
 ## CMS data and licensing
 
@@ -84,6 +83,7 @@ not redistributed here.
 | False positives (definite or likely) on 10 clean bills | 0 |
 | Clean-PDF extraction (text-layer extractor) | 100% field accuracy |
 | Photo extraction | **not measured** (needs `ANTHROPIC_API_KEY` and the vision model) |
+| Multilingual eval, 20 questions each in Spanish and Mongolian (simulated model) | 100% number integrity, 5/5 deferrals, 15/15 grounded; offline keyword routing without any model: 19/20 (es), 18/20 (mn). Not a measure of translation quality |
 | Explainer validator, 20 findings, simulated LLM | 0 accepted texts with an invented number, code or banned word; template fallback fires on a fixed schedule to prove the safety net |
 
 Q&A: questions are translated to English (numbers placeholdered), routed to one of six supported answer types or a glossary-term definition, and answered from the case data only. Anything else, including coverage and personal-plan questions ("will my insurance cover...", "what is my deductible"), gets a fixed deferral phrase pointing to the billing office; medical and legal questions get a fixed redirect. Without a model, Spanish and Mongolian questions are still routed by keyword hints in the glossary files, and the answer is shown in English with a notice.
@@ -92,4 +92,4 @@ Translation safety (unit-tested with deliberately corrupted numbers): the model 
 
 Honest caveats: the clean-PDF number comes from PDFs our own generator made. The explainer eval uses an offline
 stand-in unless `ANTHROPIC_API_KEY` is set, so it tests the validator, not model quality. Spanish and Mongolian
-glossary and phrase files are **drafts that need review by a native speaker**.
+glossary and phrase files are **drafts written by Claude that need review by a native speaker**; no native speaker has checked them yet.
