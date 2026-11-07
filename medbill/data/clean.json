@@ -1,0 +1,20 @@
+{
+  "bill": {
+    "provider": "Synthetic Family Clinic",
+    "account_number": "ACCT-0002",
+    "patient_balance": 40.00,
+    "lines": [
+      {"id": "B1", "date": "2024-05-02", "code": "99213", "modifiers": [], "description": "Office visit", "units": 1, "billed": 150.00, "patient_owed": 30.00},
+      {"id": "B2", "date": "2024-05-02", "code": "85025", "modifiers": [], "description": "Blood count", "units": 1, "billed": 40.00, "patient_owed": 10.00}
+    ]
+  },
+  "eob": {
+    "payer": "Synthetic Health Plan",
+    "network_status": "in",
+    "total_patient_responsibility": 40.00,
+    "lines": [
+      {"id": "E1", "date": "2024-05-02", "code": "99213", "modifiers": [], "allowed": 90.00, "plan_paid": 60.00, "patient_resp": 30.00, "status": "processed", "adjustment_reason": ""},
+      {"id": "E2", "date": "2024-05-02", "code": "85025", "modifiers": [], "allowed": 25.00, "plan_paid": 15.00, "patient_resp": 10.00, "status": "processed", "adjustment_reason": ""}
+    ]
+  }
+}

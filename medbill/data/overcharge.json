@@ -1,0 +1,25 @@
+{
+  "bill": {
+    "provider": "Synthetic Family Clinic",
+    "account_number": "ACCT-0001",
+    "patient_balance": 502.00,
+    "lines": [
+      {"id": "B1", "date": "2024-03-05", "code": "99213", "modifiers": [], "description": "Office visit", "units": 1, "billed": 150.00, "patient_owed": 30.00},
+      {"id": "B2", "date": "2024-03-05", "code": "80053", "modifiers": [], "description": "Metabolic panel", "units": 1, "billed": 95.00, "patient_owed": 20.00},
+      {"id": "B3", "date": "2024-03-05", "code": "80053", "modifiers": [], "description": "Metabolic panel", "units": 1, "billed": 95.00, "patient_owed": 95.00},
+      {"id": "B4", "date": "2024-03-05", "code": "82947", "modifiers": [], "description": "Glucose test", "units": 1, "billed": 110.00, "patient_owed": 110.00},
+      {"id": "B5", "date": "2024-04-12", "code": "99214", "modifiers": [], "description": "Office visit, longer", "units": 1, "billed": 400.00, "patient_owed": 247.00}
+    ]
+  },
+  "eob": {
+    "payer": "Synthetic Health Plan",
+    "network_status": "in",
+    "total_patient_responsibility": 90.00,
+    "lines": [
+      {"id": "E1", "date": "2024-03-05", "code": "99213", "modifiers": [], "allowed": 90.00, "plan_paid": 60.00, "patient_resp": 30.00, "status": "processed", "adjustment_reason": ""},
+      {"id": "E2", "date": "2024-03-05", "code": "80053", "modifiers": [], "allowed": 40.00, "plan_paid": 20.00, "patient_resp": 20.00, "status": "processed", "adjustment_reason": ""},
+      {"id": "E3", "date": "2024-03-05", "code": "82947", "modifiers": [], "allowed": 0.00, "plan_paid": 0.00, "patient_resp": 0.00, "status": "denied-bundled", "adjustment_reason": "CARC 97"},
+      {"id": "E4", "date": "2024-04-12", "code": "99214", "modifiers": [], "allowed": 200.00, "plan_paid": 160.00, "patient_resp": 40.00, "status": "processed", "adjustment_reason": ""}
+    ]
+  }
+}
