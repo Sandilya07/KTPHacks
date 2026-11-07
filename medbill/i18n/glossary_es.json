@@ -1,0 +1,130 @@
+{
+  "lang": "es",
+  "name": "Español",
+  "reviewed": false,
+  "speech_lang": "es-US",
+  "_note": "Draft translations written by Claude. Needs review by a native speaker before real use.",
+  "terms": {
+    "deductible": {
+      "pinned": "deducible"
+    },
+    "copay": {
+      "pinned": "copago"
+    },
+    "coinsurance": {
+      "pinned": "coseguro"
+    },
+    "allowed amount": {
+      "pinned": "monto permitido"
+    },
+    "in-network": {
+      "pinned": "dentro de la red"
+    },
+    "out-of-network": {
+      "pinned": "fuera de la red"
+    },
+    "prior authorization": {
+      "pinned": "autorización previa"
+    },
+    "balance billing": {
+      "pinned": "facturación del saldo"
+    },
+    "billed amount": {
+      "pinned": "monto facturado"
+    },
+    "patient responsibility": {
+      "pinned": "responsabilidad del paciente"
+    },
+    "claim": {
+      "pinned": "reclamo"
+    },
+    "denial": {
+      "pinned": "denegación"
+    },
+    "appeal": {
+      "pinned": "apelación"
+    },
+    "itemized bill": {
+      "pinned": "factura detallada"
+    },
+    "EOB": {
+      "pinned": "explicación de beneficios (EOB)",
+      "check": "EOB"
+    }
+  },
+  "phrases": {
+    "defer": "La factura y los documentos de este caso no muestran esa información. Le sugerimos preguntar a la oficina de facturación.",
+    "redirect_medical": "No puedo dar consejos médicos. Para preguntas sobre su salud o su tratamiento, hable con su médico.",
+    "redirect_legal": "No puedo dar consejos legales. Si necesita asesoría legal, consulte a un abogado o a un defensor del paciente.",
+    "translation_notice": "No pudimos verificar la traducción de este texto, así que se muestra en inglés."
+  },
+  "hints": {
+    "charged_twice": [
+      "dos veces",
+      "doble",
+      "duplicad",
+      "otra vez"
+    ],
+    "how_much_owe": [
+      "cuánto debo",
+      "cuanto debo",
+      "cuánto tengo que pagar",
+      "cuanto tengo que pagar",
+      "cuánto pago",
+      "cuanto pago"
+    ],
+    "what_to_say": [
+      "qué digo",
+      "que digo",
+      "qué le digo",
+      "que le digo",
+      "qué debo decir",
+      "que debo decir",
+      "llamar",
+      "llamo"
+    ],
+    "what_is_eob": [
+      "eob",
+      "explicación de beneficios",
+      "explicacion de beneficios"
+    ],
+    "what_happens_next": [
+      "qué pasa después",
+      "que pasa despues",
+      "qué sigue",
+      "que sigue",
+      "próximos pasos",
+      "proximos pasos"
+    ],
+    "charge_meaning": [
+      "qué significa",
+      "que significa",
+      "qué es este cargo",
+      "que es este cargo",
+      "qué es el código",
+      "que es el codigo"
+    ],
+    "coverage": [
+      "cubrirá",
+      "cubrira",
+      "cubre",
+      "cobertura"
+    ],
+    "medical": [
+      "diagnóstico",
+      "diagnostico",
+      "medicamento",
+      "tratamiento",
+      "síntoma",
+      "sintoma",
+      "debo tomar"
+    ],
+    "legal": [
+      "abogado",
+      "demandar",
+      "legal",
+      "mis derechos",
+      "ley"
+    ]
+  }
+}

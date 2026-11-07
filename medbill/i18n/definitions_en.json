@@ -1,0 +1,17 @@
+{
+  "deductible": "A deductible is the amount you pay for care before your plan starts to pay.",
+  "copay": "A copay is a fixed amount you pay for a visit or service.",
+  "coinsurance": "Coinsurance is the share of the cost you pay after the deductible, often a percentage.",
+  "allowed amount": "The allowed amount is the most your plan counts for a service. In-network providers agree to it.",
+  "EOB": "An EOB (explanation of benefits) is a statement from your insurance. It shows what was billed, what the plan allowed and paid, and what you owe. It is not a bill.",
+  "in-network": "In-network means the provider has an agreement with your plan about prices.",
+  "out-of-network": "Out-of-network means the provider has no price agreement with your plan.",
+  "prior authorization": "Prior authorization is approval from your plan before certain care.",
+  "balance billing": "Balance billing is when a provider bills you for the difference between its price and the allowed amount.",
+  "billed amount": "The billed amount is the price the provider lists before insurance.",
+  "patient responsibility": "Patient responsibility is the part of the cost that you owe.",
+  "claim": "A claim is a request for payment that the provider sends to your insurance.",
+  "denial": "A denial is when the plan decides not to pay for a service.",
+  "appeal": "An appeal is a request that the plan reconsider a denial.",
+  "itemized bill": "An itemized bill lists every charge with its code, date and price."
+}
