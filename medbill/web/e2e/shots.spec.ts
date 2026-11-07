@@ -25,4 +25,7 @@ test('screens', async ({ page }, info) => {
   await page.getByRole('button', { name: 'Why was I charged twice?' }).click()
   await page.getByTestId('msg-assistant').nth(1).waitFor()
   await shot('5-ask')
+  await page.getByRole('button', { name: 'Write the letter' }).click()
+  await page.getByTestId('letter-english').waitFor()
+  await shot('6-letter')
 })

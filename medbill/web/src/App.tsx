@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createManual, deleteCase, getConfig } from './api'
 import { Banner, ErrorBox, Screen, Spinner, Stepper } from './components/Chrome'
 import Ask from './screens/Ask'
+import Letter from './screens/Letter'
 import Results from './screens/Results'
 import Review from './screens/Review'
 import Upload from './screens/Upload'
@@ -49,6 +50,7 @@ export default function App() {
         {config && step === 1 && <Upload s={s} config={config} onCase={(c) => { setCase(c); setStep(2) }} onBack={() => setStep(0)} onManual={() => createManual().then((c) => { setCase(c); setStep(2) })} />}
         {config && step === 2 && kase && <Review key={kase.case_id} s={s} kase={kase} onConfirmed={(c) => { setCase(c); setAudit(null); setAuditKey(''); setHighlight({ ids: [], nonce: 0 }); setStep(3) }} onBack={() => setStep(1)} />}
         {config && step === 3 && kase && <Results s={s} lang={lang} kase={kase} audit={audit} auditKey={auditKey} setAudit={(a, k) => { setAudit(a); setAuditKey(k) }} highlight={highlight} setHighlight={setHighlight} onAsk={() => setStep(4)} onLetter={() => setStep(5)} onBack={() => setStep(2)} />}
+        {config && step === 5 && kase && <Letter s={s} lang={lang} kase={kase} onBack={() => setStep(4)} />}
         {config && step === 4 && kase && <Ask s={s} config={config} lang={lang} kase={kase} audit={audit} onJump={(h) => { setHighlight(h); setStep(3) }} onLetter={() => setStep(5)} onBack={() => setStep(3)} />}
       </main>
     </>
