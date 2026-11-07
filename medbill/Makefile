@@ -9,3 +9,4 @@ data:
 eval: data
 	$(PY) scripts/eval_audit.py
 	$(PY) scripts/eval_extraction.py
+	$(PY) scripts/eval_explainer.py
