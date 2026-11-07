@@ -25,7 +25,8 @@ class AnthropicLLM:
 
     def complete_tool(self, system: str, user: str, tool: dict) -> dict:
         resp = self.client.messages.create(
-            model=self.model, max_tokens=self.max_tokens, system=system, tools=[tool],
+            model=self.model, max_tokens=max(self.max_tokens, 12000) if tool["name"] == "translate_interface" else self.max_tokens,
+            system=system, tools=[tool],
             tool_choice={"type": "tool", "name": tool["name"]},
             messages=[{"role": "user", "content": user}],
         )

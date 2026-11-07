@@ -54,7 +54,8 @@ def load_pages(path: str | Path) -> list[Page]:
 
 def _load_pdf(path: Path) -> list[Page]:
     pages = []
-    with pymupdf.open(path) as doc:
+    # Opening bytes also avoids retaining a Windows file handle if a malformed PDF fails to open.
+    with pymupdf.open(stream=path.read_bytes(), filetype="pdf") as doc:
         for i, p in enumerate(doc):
             pix = p.get_pixmap(dpi=DPI)
             img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)

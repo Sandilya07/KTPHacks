@@ -6,7 +6,11 @@ const SAMPLES = fileURLToPath(new URL('../../data/samples', import.meta.url))
 
 async function start(page: Page, sample: string, language = 'English') {
   await page.goto('/')
-  await page.getByRole('radio', { name: language }).check()
+  if (language !== 'English') {
+    await page.locator('#language-text').fill(language === 'Español' ? 'Quiero entender mi factura' : 'Би нэхэмжлэхээ ойлгохыг хүсэж байна')
+    await page.getByRole('button', { name: 'Send', exact: true }).click()
+    await expect(page.locator('html')).toHaveAttribute('lang', language === 'Español' ? 'es' : 'mn')
+  }
   await page.getByRole('button', { name: /^(Get started|Comenzar|Эхлэх)$/ }).click()
   await page.getByTestId(`sample-${sample}`).click()
   await page.getByTestId('looks-right').waitFor()

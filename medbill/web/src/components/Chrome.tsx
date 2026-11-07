@@ -3,7 +3,7 @@ import { fmt, type Strings } from '../strings'
 
 export function Banner({ s }: { s: Strings }) {
   return (
-    <div role="note" className="border-b-2 border-amber-300 bg-amber-50 px-4 py-2 text-center text-base text-amber-950">
+    <div role="note" className="border-b border-slate-200 bg-white px-4 py-2 text-center text-xs text-slate-600">
       {s.banner}
     </div>
   )
@@ -15,7 +15,7 @@ export function Stepper({ s, step }: { s: Strings; step: number }) {
       <ol className="flex items-center gap-1.5" role="list">
         {s.steps.map((name, i) => (
           <li key={name} className="flex-1" aria-current={i === step ? 'step' : undefined}>
-            <div className={`h-2 rounded-full ${i < step ? 'bg-blue-800' : i === step ? 'bg-blue-600' : 'bg-slate-300'}`} />
+            <div className={`h-2 rounded-full ${i < step ? 'bg-teal-800' : i === step ? 'bg-teal-600' : 'bg-slate-300'}`} />
             <span className={`mt-1 hidden text-sm sm:block ${i === step ? 'font-semibold text-slate-900' : 'text-slate-600'}`}>{name}</span>
           </li>
         ))}
@@ -28,7 +28,7 @@ export function Stepper({ s, step }: { s: Strings; step: number }) {
 export function Spinner({ message }: { message: string }) {
   return (
     <div role="status" aria-live="polite" className="card flex items-center gap-4">
-      <span aria-hidden className="size-7 animate-spin rounded-full border-4 border-slate-300 border-t-blue-800" />
+      <span aria-hidden className="size-7 animate-spin rounded-full border-4 border-slate-300 border-t-teal-800" />
       <span className="text-lg">{message}</span>
     </div>
   )

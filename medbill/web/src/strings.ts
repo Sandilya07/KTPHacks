@@ -273,3 +273,24 @@ export const t = (lang: string): Strings => STRINGS[lang] ?? en
 export const fmt = (s: string, vars: Record<string, string | number>): string =>
   s.replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k] ?? ''))
 export const money = (n: number): string => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+
+// Flatten interface copy for a single translation request; restore its original shape afterwards.
+export function interfaceText(): Record<string, string> {
+  const out: Record<string, string> = {}
+  function visit(value: unknown, path: string) {
+    if (typeof value === 'string') out[path] = value
+    else if (value && typeof value === 'object') Object.entries(value).forEach(([k, v]) => visit(v, path ? path + '.' + k : k))
+  }
+  visit(en, '')
+  return out
+}
+export function translatedStrings(lang: string, values: Record<string, string>): Strings {
+  const copy = structuredClone(t(lang))
+  for (const [path, value] of Object.entries(values)) {
+    const parts = path.split('.')
+    let target: any = copy
+    for (const part of parts.slice(0, -1)) target = target[part]
+    target[parts[parts.length - 1]] = value
+  }
+  return copy
+}

@@ -16,7 +16,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `${py} -m uvicorn api.main:app_factory --factory --port 8000`,
+      command: `"${py}" -m uvicorn api.main:app_factory --factory --port 8000`,
       cwd: '..',
       url: 'http://127.0.0.1:8000/health',
       env: { DEMO_MODE: '1' },

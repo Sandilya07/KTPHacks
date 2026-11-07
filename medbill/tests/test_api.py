@@ -43,6 +43,32 @@ def test_config_lists_languages_and_samples(client):
     assert c["model_available"] is False and len(c["suggested_questions"]) == 6
 
 
+def test_language_detects_demo_text_without_selection(client):
+    result = client.post("/language", json={"text": "Quiero entender mi factura"})
+    assert result.status_code == 200
+    assert result.json()["language"] == "es"
+    assert client.post("/language", json={"text": ""}).status_code == 422
+
+
+def test_language_translates_interface_and_preserves_variables():
+    def translate(system, user, tool, n):
+        if tool == "detect_language":
+            return {"language": "fr"}
+        return {"strings": {"total": "Montant : {amount}"}}
+    with TestClient(create_app(Settings(demo_mode=False), llm=FnLLM(translate))) as c:
+        result = c.post("/language", json={"text": "Bonjour", "strings": {"total": "Total: {amount}"}})
+        assert result.status_code == 200
+        assert result.json()["strings"]["total"] == "Montant : {amount}"
+
+
+def test_language_rejects_translation_that_changes_amounts():
+    def translate(system, user, tool, n):
+        return {"language": "fr"} if tool == "detect_language" else {"strings": {"total": "Total 99"}}
+    with TestClient(create_app(Settings(demo_mode=False), llm=FnLLM(translate))) as c:
+        result = c.post("/language", json={"text": "Bonjour", "strings": {"total": "Total $95.00"}})
+        assert result.status_code == 503
+
+
 def test_sample_flow_totals_412_with_evidence(client):
     _cid, a = confirmed_audit(client)
     assert a["total_impact"] == 412.0 and len(a["findings"]) == 3 and not a["no_errors"]
@@ -95,7 +121,7 @@ def test_missing_files_and_bad_inputs(client):
     assert r.status_code == 422 and "hard to read" in r.json()["detail"]
     assert client.get("/cases/deadbeef").status_code == 404
     cid = start(client)["case_id"]
-    assert client.post(f"/cases/{cid}/audit?lang=xx").status_code == 422
+    assert client.post(f"/cases/{cid}/audit?lang=invalid-language-code").status_code == 422
 
 
 def test_edits_reset_confirmation_and_change_findings(client):
@@ -142,7 +168,7 @@ def test_ask_english_and_deferral(client):
     assert not a["deferred"] and "$412.00" in a["answer"] and a["citations"]
     d = client.post(f"/cases/{cid}/ask", json={"question": "Will my insurance cover surgery?", "language": "en"}).json()
     assert d["deferred"]
-    assert client.post(f"/cases/{cid}/ask", json={"question": "x", "language": "zz"}).status_code == 422
+    assert client.post(f"/cases/{cid}/ask", json={"question": "x", "language": "invalid-code-value"}).status_code == 422
 
 
 def test_spanish_end_to_end_with_mocked_model():

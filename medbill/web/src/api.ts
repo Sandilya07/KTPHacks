@@ -65,3 +65,7 @@ export function createManual() {
   }
   return fetch(`${BASE}/cases/manual`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => json<CaseView>(r))
 }
+
+export const detectLanguage = (text: string, strings: Record<string, string>) =>
+  fetch(BASE + '/language', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, strings }) })
+    .then((r) => json<{ language: string; strings: Record<string, string>; notice?: string }>(r))

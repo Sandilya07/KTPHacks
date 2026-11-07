@@ -212,8 +212,11 @@ class QA:
 
     def _fixed(self, kind: str, lang: str, english: str, q_en: str | None) -> QAResult:
         key = {"defer": "defer", "medical": "redirect_medical", "legal": "redirect_legal"}[kind]
-        text = english if lang == "en" else load_glossary(lang).phrases[key]
-        return QAResult(text, lang, kind, [], True, q_en, english)
+        phrases = load_glossary(lang).phrases if lang != "en" else {}
+        if lang == "en" or key in phrases:
+            return QAResult(english if lang == "en" else phrases[key], lang, kind, [], True, q_en, english)
+        tr = self.translator.translate(english, lang)
+        return QAResult(tr.text, lang, kind, [], True, q_en, english, tr.notice, tr.verified)
 
     def _rephrase(self, case: Case, draft: Answer, facts: Facts) -> Answer:
         if self.llm is None:
@@ -231,7 +234,7 @@ class QA:
         return draft
 
     def ask(self, case: Case, question: str, lang: str = "auto") -> QAResult:
-        lang = detect_language(question) if lang == "auto" else lang
+        lang = self.translator.detect_language(question) if lang == "auto" else lang
         q_en = self.translator.to_english(question, lang)
         intent = detect_intent_en(q_en) if q_en else None
         if intent is None and lang != "en":

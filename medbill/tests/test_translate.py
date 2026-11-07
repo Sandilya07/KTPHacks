@@ -90,3 +90,20 @@ def test_english_is_a_noop_and_questions_roundtrip():
     assert Translator(FnLLM(fn)).to_english("¿Cuánto debo por 99213?", "es") == "How much do I owe for 99213?"
     bad = lambda s, u, t, n: {"english": "How much do I owe for 55555?"}
     assert Translator(FnLLM(bad)).to_english("¿Cuánto debo por 99213?", "es") is None
+
+
+def test_detects_languages_outside_demo_glossaries():
+    llm = FnLLM(lambda s, u, t, n: {"language": "fr"})
+    assert Translator(llm).detect_language("Je veux comprendre ma facture") == "fr"
+    assert llm.calls[0][2] == "detect_language"
+
+
+def test_unknown_glossary_uses_verified_model_translation():
+    tr = Translator(FnLLM(good)).translate("Code 99213 costs $95.00.", "fr")
+    assert tr.verified and "99213" in tr.text and "$95.00" in tr.text
+
+
+def test_rejects_invalid_detected_language():
+    import pytest
+    with pytest.raises(ValueError):
+        Translator(FnLLM(lambda s, u, t, n: {"language": "../../file"})).detect_language("hello")

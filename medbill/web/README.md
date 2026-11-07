@@ -1,32 +1,27 @@
-# React + TypeScript + Vite
+# MedBill web app
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Run the API from `medbill` and the web app from `medbill/web`:
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```powershell
+.venv\Scripts\python.exe -m uvicorn api.main:app_factory --factory --port 8000
+npm.cmd run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Run the Python command from `medbill`; run the npm command from `medbill/web`.
+
+The welcome screen accepts a sentence in the user's language. Send it to detect the language and translate the interface, then start the document review. Questions also detect their language automatically and update the experience when the language changes. Speech input and playback controls have been removed.
+
+Live detection and translation use the existing configured model (`ANTHROPIC_API_KEY`, optional `MODEL`, and `DEMO_MODE=0` in the API process environment). Languages do not require a glossary file; existing reviewed glossaries still guide Spanish and Mongolian translations. Short or ambiguous text may be misidentified, so use a full sentence.
+
+Offline/demo mode retains English, Spanish and Mongolian detection and cached translations. It does not provide arbitrary-language translation. Failed verification shows English with a notice. Amounts, billing codes, dates and account identifiers keep the existing placeholder verification. Interface translations also verify placeholders and template variables. Original documents and the English letter for sending remain available.
+
+Checks:
+
+```powershell
+npm.cmd run build
+# From medbill:
+.venv\Scripts\python.exe -m pytest tests/test_translate.py tests/test_qa.py tests/test_api.py tests/test_i18n_letter.py -q
+# From medbill/web, using a Python environment with API dependencies:
+$env:PY = (Resolve-Path '../.venv/Scripts/python.exe').Path
+npx.cmd playwright test
+```

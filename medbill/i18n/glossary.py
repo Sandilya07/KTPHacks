@@ -56,7 +56,7 @@ def load_glossary(lang: str) -> Glossary:
     if lang not in _cache:
         path = DIR / f"glossary_{lang}.json"
         if not path.exists():
-            raise KeyError(f"No glossary for language '{lang}'")
+            return Glossary(lang, lang, False, {}, {})
         d = json.loads(path.read_text(encoding="utf-8"))
         _cache[lang] = Glossary(d["lang"], d["name"], d.get("reviewed", False), d["terms"], d["phrases"],
                                 d.get("hints", {}), d.get("speech_lang", d["lang"]))

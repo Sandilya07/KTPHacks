@@ -117,5 +117,18 @@ def test_language_detection():
     assert detect_language("How much do I owe?") == "en"
 
 
+def test_auto_detection_uses_model_for_new_languages(case):
+    def fn(system, user, tool, n):
+        if tool == "detect_language":
+            return {"language": "fr"}
+        if tool == "to_english":
+            return {"english": "How much do I owe?" if "Translate the user's question" in system else user}
+        return {"translation": user}
+    result = QA(Translator(FnLLM(fn))).ask(case, "Combien dois-je payer ?")
+    assert result.language == "fr"
+    assert result.kind == "how_much_owe"
+    assert "$502.00" in result.answer
+
+
 def test_build_answer_none_for_unknown_intent(case):
     assert build_answer(case, "nonsense", "x") is None

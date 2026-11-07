@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import io
+import re
 import json
 import tempfile
 from pathlib import Path
@@ -49,7 +50,7 @@ def languages() -> list[dict]:
 
 
 def check_lang(lang: str) -> str:
-    if lang != "en" and lang not in supported_languages():
+    if not re.fullmatch(r"[a-z]{2,3}(?:-[A-Za-z]{2,8})?", lang):
         raise ApiError(422, f"Language '{lang}' is not supported.")
     return lang
 
