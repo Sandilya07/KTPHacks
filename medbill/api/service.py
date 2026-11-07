@@ -103,12 +103,17 @@ def sample_files(name: str, settings: Settings) -> dict[str, tuple[str, bytes]]:
     return {k: (pick(k).name, pick(k).read_bytes()) for k in ("bill", "eob")}
 
 
+def _dims(page) -> dict:
+    return {"width": page.image.width / page.scale, "height": page.image.height / page.scale}
+
+
 def case_view(rec: Record) -> dict:
     c = rec.case
     return {"case_id": c.case_id, "confirmed": c.confirmed, "language": c.language, "warnings": c.warnings,
             "extractor": rec.extractor, "sample": rec.sample,
             "bill": c.bill.model_dump(mode="json"), "eob": c.eob.model_dump(mode="json"),
-            "pages": {"bill": len(rec.bill_pages), "eob": len(rec.eob_pages)}}
+            # page size in the same coordinates as line bounding boxes, so the UI can place highlights
+            "pages": {"bill": [_dims(p) for p in rec.bill_pages], "eob": [_dims(p) for p in rec.eob_pages]}}
 
 
 def page_png(rec: Record, doc: str, page: int) -> bytes:
