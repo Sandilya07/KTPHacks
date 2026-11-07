@@ -135,10 +135,15 @@ def _row(case: Case, f: Finding, matches) -> DisputeRow:
 
 
 def default_paragraphs(case: Case) -> tuple[str, str]:
-    n = sum(1 for f in case.findings if f.impact > 0)
-    opening = (f"I am writing to ask your billing department to review my account. After comparing my itemized "
-               f"bill with my insurance statement, I found {n} charge{'s' if n != 1 else ''} that I would like you "
-               f"to look at. The total amount in question is {money(case.total_impact)}.")
+    """No counts in the text: every sentence stays reusable (and translatable from a cache) for any case."""
+    if any(f.impact > 0 for f in case.findings):
+        opening = ("I am writing to ask your billing department to review my account. After comparing my itemized "
+                   "bill with my insurance statement, I found charges that I would like you to look at. "
+                   f"The total amount in question is {money(case.total_impact)}.")
+    else:
+        opening = ("I am writing to ask your billing department to review my account and send me an itemized bill "
+                   "with codes. I compared my itemized bill with my insurance statement and found nothing to "
+                   "dispute at this time.")
     closing = ("Thank you for your time. I would appreciate a written reply and, if the charges are correct, "
                "a short explanation so I can understand them.")
     return opening, closing

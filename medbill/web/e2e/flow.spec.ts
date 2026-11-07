@@ -158,3 +158,23 @@ test('accessibility: axe reports no critical violations on any screen', async ({
   await page.getByTestId('letter-english').waitFor()
   await check('letter')
 })
+
+test('Mongolian demo path: results, grounded answer and side-by-side letter, all verified offline', async ({ page }) => {
+  await start(page, 'overcharge', 'Монгол')
+  await expect(page.getByRole('heading', { name: 'Бидний уншсныг шалгана уу' })).toBeVisible()
+  await toResults(page)
+  await expect(page.getByTestId('headline')).toContainText('$412.00')
+  await expect(page.getByText('Анхаарах')).toHaveCount(0)
+  await expect(page.locator('article').first()).toContainText('кодыг')
+  await expect(page.getByRole('note')).toHaveCount(1) // only the page banner: no "could not be checked" notices
+  await page.getByRole('button', { name: 'Асуулт асуух' }).click()
+  await page.getByRole('button', { name: 'Би үнэндээ хэдийг төлөх ёстой вэ?' }).click()
+  const answer = page.getByTestId('msg-assistant').first()
+  await expect(answer).toContainText('$412.00')
+  await expect(answer).toContainText('нэхэмжлэх')
+  await page.getByRole('button', { name: 'Захидал бичих' }).click()
+  const sbs = page.getByTestId('letter-side-by-side')
+  await expect(sbs).toContainText('Маргаантай нийт дүн: $412.00.')
+  await expect(sbs).toContainText('Total amount in question: $412.00.')
+  await expect(page.getByRole('note')).toHaveCount(1)
+})

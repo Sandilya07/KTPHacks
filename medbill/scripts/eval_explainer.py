@@ -85,15 +85,11 @@ class SimulatedLLM:
         return text
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--llm", choices=["live", "simulated", "none"], default=None)
-    args = ap.parse_args()
-    mode = args.llm or ("live" if os.environ.get("ANTHROPIC_API_KEY") else "simulated")
+def compute(choice: str | None = None) -> dict | None:
+    mode = choice or ("live" if os.environ.get("ANTHROPIC_API_KEY") else "simulated")
     pairs = gather()
     if len(pairs) < 20:
-        print("Need data/synthetic (run: make data)")
-        return 2
+        return None
     if mode == "live":
         from llm import AnthropicLLM
         llm = AnthropicLLM()
@@ -108,14 +104,26 @@ def main() -> int:
         if not validate_text(e.text(), facts_for_finding(case, f), f.tier).ok:
             leaks += 1
     s = ex.stats
-    print(f"LLM mode: {mode}{'  (offline stand-in: tests the validator, not model quality)' if mode == 'simulated' else ''}")
-    print(f"Findings explained        : {s.total}  ({len({(f.rule, f.tier) for _, f in pairs})} distinct rule/tier types)")
-    print(f"Accepted from the LLM     : {s.llm_ok}")
-    print(f"Validator rejections      : {s.validator_failures}")
-    print(f"Template fallbacks        : {s.fallbacks}  ({100 * s.fallback_rate:.0f}%)")
-    print(f"Accepted text with a number/code/banned word not in its finding: {leaks}")
-    print("PASS" if leaks == 0 else "FAIL")
-    return 0 if leaks == 0 else 1
+    return {"mode": mode, "total": s.total, "llm_ok": s.llm_ok, "rejections": s.validator_failures,
+            "fallbacks": s.fallbacks, "fallback_rate": s.fallback_rate, "leaks": leaks,
+            "types": len({(f.rule, f.tier) for _, f in pairs}), "pass": leaks == 0}
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--llm", choices=["live", "simulated", "none"], default=None)
+    r = compute(ap.parse_args().llm)
+    if r is None:
+        print("Need data/synthetic (run: make data)")
+        return 2
+    print(f"LLM mode: {r['mode']}{'  (offline stand-in: tests the validator, not model quality)' if r['mode'] == 'simulated' else ''}")
+    print(f"Findings explained        : {r['total']}  ({r['types']} distinct rule/tier types)")
+    print(f"Accepted from the LLM     : {r['llm_ok']}")
+    print(f"Validator rejections      : {r['rejections']}")
+    print(f"Template fallbacks        : {r['fallbacks']}  ({100 * r['fallback_rate']:.0f}%)")
+    print(f"Accepted text with a number/code/banned word not in its finding: {r['leaks']}")
+    print("PASS" if r["pass"] else "FAIL")
+    return 0 if r["pass"] else 1
 
 
 if __name__ == "__main__":

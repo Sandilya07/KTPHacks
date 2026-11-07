@@ -7,8 +7,8 @@ Synthetic Family Clinic - Billing Department
 Re: Request for review of account ACCT-0001
 
 I am writing to ask your billing department to review my account. After comparing my
-itemized bill with my insurance statement, I found 3 charges that I would like you to look
-at. The total amount in question is $412.00.
+itemized bill with my insurance statement, I found charges that I would like you to look at.
+The total amount in question is $412.00.
 
 Disputed charges
 1. 2024-03-05 | code 80053 | billed $95.00 | patient owed $95.00 | EOB says: Lists this

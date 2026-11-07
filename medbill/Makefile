@@ -7,9 +7,6 @@ lint:
 data:
 	$(PY) scripts/generate_synthetic.py
 eval: data
-	$(PY) scripts/eval_audit.py
-	$(PY) scripts/eval_extraction.py
-	$(PY) scripts/eval_explainer.py
-	$(PY) scripts/eval_i18n.py
+	$(PY) scripts/eval_dashboard.py
 web-test:
-	cd web && PY=$(abspath $(PY)) npx playwright test flow
+	cd web && PY="$(PY)" npx playwright test flow

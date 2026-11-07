@@ -84,6 +84,13 @@ class Answer:
     citations: list[str] = field(default_factory=list)
     kind: str = ""
     deferred: bool = False
+    # The same text as reusable sentences. Translating sentence by sentence means a human-written
+    # translation (DEMO_MODE cache) can be reused for any case that produces the same sentences.
+    parts: list[str] | None = None
+
+    @classmethod
+    def of(cls, parts: list[str], citations: list[str], kind: str) -> Answer:
+        return cls(" ".join(parts), citations, kind, parts=parts)
 
 
 @dataclass
@@ -108,71 +115,70 @@ def qa_facts(case: Case) -> Facts:
 
 
 # ---- deterministic answer builders ------------------------------------------------------------
-def _expl(case: Case, f: Finding) -> str:
+def _expl_parts(case: Case, f: Finding) -> list[str]:
     e = fallback_explanation(case, f)
-    return f"{e['what_happened']} {e['why_it_matters']}"
+    return [e["what_happened"], e["why_it_matters"]]
 
 
-def _line_answer(case: Case, line) -> tuple[str, list[str]]:
+def _line_parts(case: Case, line) -> tuple[list[str], list[str]]:
     from audit.matching import match_lines
     eob = match_lines(case).pairs.get(line.id)
-    text = (f"Code {line.code}: {code_note(case, line.code)} On {line.date}, line {line.id} on your bill shows billed "
-            f"{money(line.billed)} and patient owed {money(line.patient_owed)}.")
+    parts = [f"Code {line.code}: {code_note(case, line.code)}",
+             f"On {line.date}, line {line.id} on your bill shows billed {money(line.billed)} and patient owed {money(line.patient_owed)}."]
     cites = [line.id]
     if eob:
-        text += f" Your EOB (line {eob.id}) shows patient responsibility {money(eob.patient_resp)}."
+        parts.append(f"Your EOB (line {eob.id}) shows patient responsibility {money(eob.patient_resp)}.")
         cites.append(eob.id)
     for f in case.findings:
         if line.id in f.line_ids:
-            text += f" Our checks flagged this line. {_expl(case, f)}"
+            parts += ["Our checks flagged this line.", *_expl_parts(case, f)]
             cites.append(f.id)
-    return text, cites
+    return parts, cites
 
 
 def build_answer(case: Case, intent: str, question_en: str) -> Answer | None:
     """Deterministic English answer from the case data, or None when the data cannot answer."""
     fs = case.findings
     if intent == "what_is_eob":
-        return Answer(f"{DEFINITIONS['EOB']} Compare each line on your EOB with your bill.", [], intent)
+        return Answer.of([DEFINITIONS["EOB"], "Compare each line on your EOB with your bill."], [], intent)
     if intent == "define_term":
         for term, pat in TERM_PATTERNS.items():
             if re.search(pat, question_en, re.IGNORECASE) and term in DEFINITIONS:
-                return Answer(DEFINITIONS[term], [], intent)
+                return Answer.of([DEFINITIONS[term]], [], intent)
         return None
     if intent == "charged_twice":
         dups = [f for f in fs if f.rule == "duplicate_charge"]
         if not dups:
-            return Answer("Our checks did not find a code billed twice on the same day. If you see two lines you do "
-                          "not understand, it is worth asking the billing office about them.", [], intent)
-        return Answer(" ".join(_expl(case, f) for f in dups), [i for f in dups for i in [f.id, *f.line_ids]], intent)
+            return Answer.of(["Our checks did not find a code billed twice on the same day.",
+                              "If you see two lines you do not understand, it is worth asking the billing office about them."], [], intent)
+        return Answer.of([p for f in dups for p in _expl_parts(case, f)], [i for f in dups for i in [f.id, *f.line_ids]], intent)
     if intent == "how_much_owe":
-        text = f"Your bill asks you to pay {money(case.bill.patient_balance)}."
+        parts = [f"Your bill asks you to pay {money(case.bill.patient_balance)}."]
         cites = []
         if case.eob.total_patient_responsibility:
-            text += f" Your EOB says your share is {money(case.eob.total_patient_responsibility)}."
+            parts.append(f"Your EOB says your share is {money(case.eob.total_patient_responsibility)}.")
         if case.total_impact > 0:
-            text += (f" Our checks found {money(case.total_impact)} that may not be owed, so the amount you actually "
-                     "owe may be lower.")
+            parts.append(f"Our checks found {money(case.total_impact)} that may not be owed, so the amount you actually owe may be lower.")
             cites = [f.id for f in fs if f.impact > 0]
         else:
-            text += " Our checks did not find a reason to question the amount."
-        return Answer(text + " Only the billing office can confirm the final amount.", cites, intent)
+            parts.append("Our checks did not find a reason to question the amount.")
+        return Answer.of([*parts, "Only the billing office can confirm the final amount."], cites, intent)
     if intent == "what_to_say":
-        text = f"When you call the billing office, you can say: I am calling about account {case.bill.account_number}. I have my bill and my EOB."
+        parts = [f"When you call the billing office, you can say: I am calling about account {case.bill.account_number}. I have my bill and my EOB."]
         for f in fs[:3]:
-            text += f" {f.evidence} Could you review this?"
+            parts += [f.evidence, "Could you review this?"]
         if not fs:
-            text += " I would like an itemized bill with codes, please."
-        text += " Ask them to note the date of your call and the name of the person you spoke with."
-        return Answer(text, [f.id for f in fs[:3]], intent)
+            parts.append("I would like an itemized bill with codes, please.")
+        parts.append("Ask them to note the date of your call and the name of the person you spoke with.")
+        return Answer.of(parts, [f.id for f in fs[:3]], intent)
     if intent == "what_happens_next":
-        text = "First, check that the lines on your bill match your documents."
+        parts = ["First, check that the lines on your bill match your documents."]
         if fs:
-            text += " Then call the billing office and ask them to review the lines we flagged, or send the letter we prepared."
-            text += " Ask for a written reply and keep notes of who you spoke with."
+            parts += ["Then call the billing office and ask them to review the lines we flagged, or send the letter we prepared.",
+                      "Ask for a written reply and keep notes of who you spoke with."]
         else:
-            text += " Our checks did not find anything to dispute. If something still looks wrong, it is worth asking the billing office."
-        return Answer(text, [f.id for f in fs], intent)
+            parts += ["Our checks did not find anything to dispute.", "If something still looks wrong, it is worth asking the billing office."]
+        return Answer.of(parts, [f.id for f in fs], intent)
     if intent == "charge_meaning":
         codes = CODE_RE.findall(question_en)
         ids = LINE_RE.findall(question_en)
@@ -182,15 +188,15 @@ def build_answer(case: Case, intent: str, question_en: str) -> Answer | None:
         if lines:
             parts, cites = [], []
             for l in lines[:3]:
-                t, c = _line_answer(case, l)
-                parts.append(t)
+                p, c = _line_parts(case, l)
+                parts += p
                 cites += c
-            return Answer(" ".join(parts), cites, intent)
+            return Answer.of(parts, cites, intent)
         if fs:
-            return Answer(" ".join(f"{fallback_explanation(case, f)['headline']}. {_expl(case, f)}" for f in fs[:3]),
-                          [i for f in fs[:3] for i in [f.id, *f.line_ids]], intent)
-        listing = "; ".join(f"code {l.code} ({code_note(case, l.code).rstrip('.')})" for l in case.bill.lines[:5])
-        return Answer(f"Your bill lists these charges: {listing}.", [l.id for l in case.bill.lines[:5]], intent)
+            parts = [x for f in fs[:3] for x in [fallback_explanation(case, f)["headline"] + ".", *_expl_parts(case, f)]]
+            return Answer.of(parts, [i for f in fs[:3] for i in [f.id, *f.line_ids]], intent)
+        parts = ["Your bill lists these charges:"] + [f"code {l.code} ({code_note(case, l.code).rstrip('.')})." for l in case.bill.lines[:5]]
+        return Answer.of(parts, [l.id for l in case.bill.lines[:5]], intent)
     return None
 
 
@@ -221,7 +227,7 @@ class QA:
             return draft
         text, cites = str(out.get("answer", "")), list(out.get("citations", []))
         if text and validate_text(text, facts).ok and not BANNED.search(text) and set(cites) <= set(draft.citations):
-            return Answer(text, cites or draft.citations, draft.kind)
+            return Answer(text, cites or draft.citations, draft.kind)  # rephrased: translate as one text
         return draft
 
     def ask(self, case: Case, question: str, lang: str = "auto") -> QAResult:
@@ -241,5 +247,6 @@ class QA:
         if not validate_text(draft.text_en, facts).ok:  # step 4: the 3A validator (should never trigger)
             return self._fixed("defer", lang, DEFER_EN, q_en)
         draft = self._rephrase(case, draft, facts)
-        tr: Translation = self.translator.translate(draft.text_en, lang)
+        tr: Translation = (self.translator.translate_parts(draft.parts, lang) if draft.parts
+                           else self.translator.translate(draft.text_en, lang))
         return QAResult(tr.text, lang, intent, draft.citations, False, q_en, draft.text_en, tr.notice, tr.verified)

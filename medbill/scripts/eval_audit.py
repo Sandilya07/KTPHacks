@@ -18,11 +18,10 @@ RULE_FOR = {"duplicate": "duplicate_charge", "unbundled": "unbundling", "eob_mis
             "excess_units": "excess_units", "balance_billing": "balance_billing"}
 
 
-def main() -> int:
+def compute() -> dict | None:
     cases = [json.loads(p.read_text()) for p in sorted((ROOT / "data" / "synthetic").glob("*/truth.json"))]
     if not cases:
-        print("No synthetic data. Run: make data")
-        return 2
+        return None
     found = total = impact_ok = fp_strong = fp_ask = 0
     clean = 0
     misses = []
@@ -45,15 +44,24 @@ def main() -> int:
             fp_strong += sum(f.tier != "ask" for f in res.findings)
             fp_ask += sum(f.tier == "ask" for f in res.findings)
     src = get_cms_data()
-    print(f"CMS data: {src.source} {src.parts}")
-    print(f"Seeded error recall      : {found}/{total}")
-    print(f"Dollar impact exact      : {impact_ok}/{found}")
-    print(f"Clean bills              : {clean}; definite/likely false positives: {fp_strong}; 'ask' notes: {fp_ask}")
-    for m in misses:
+    return {"found": found, "total": total, "impact_ok": impact_ok, "clean": clean, "fp_strong": fp_strong,
+            "fp_ask": fp_ask, "misses": misses, "cms": f"{src.source} {src.parts}",
+            "pass": found == total and fp_strong == 0}
+
+
+def main() -> int:
+    r = compute()
+    if r is None:
+        print("No synthetic data. Run: make data")
+        return 2
+    print(f"CMS data: {r['cms']}")
+    print(f"Seeded error recall      : {r['found']}/{r['total']}")
+    print(f"Dollar impact exact      : {r['impact_ok']}/{r['found']}")
+    print(f"Clean bills              : {r['clean']}; definite/likely false positives: {r['fp_strong']}; 'ask' notes: {r['fp_ask']}")
+    for m in r["misses"]:
         print("  MISSED", m)
-    ok = found == total and fp_strong == 0
-    print("PASS" if ok else "FAIL")
-    return 0 if ok else 1
+    print("PASS" if r["pass"] else "FAIL")
+    return 0 if r["pass"] else 1
 
 
 if __name__ == "__main__":

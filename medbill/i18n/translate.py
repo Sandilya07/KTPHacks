@@ -109,6 +109,23 @@ class Translator:
             return ["back-translation: numbers or codes differ from the original"]
         return []
 
+    def translate_parts(self, parts: list[str], lang: str) -> Translation:
+        """Translate sentence by sentence and join. All or nothing: if any sentence cannot be verified the
+        whole text is shown in English, so a paragraph is never half in one language."""
+        english = " ".join(parts)
+        if lang == "en":
+            return Translation(english, "en", True, source="english")
+        done = [self.translate(p, lang) for p in parts]
+        if all(t.verified for t in done):
+            text = " ".join(t.text for t in done)
+            if same_values(english, text):
+                src = "cache" if all(t.source == "cache" for t in done) else "llm"
+                return Translation(text, lang, True, attempts=max(t.attempts for t in done), source=src,
+                                   glossary_warnings=[w for t in done for w in t.glossary_warnings])
+        bad = next((t for t in done if not t.verified), None)
+        g = load_glossary(lang)
+        return self._fail(english, lang, g, bad.errors if bad else ["numbers differ after joining"], 0)
+
     # ---- language -> English (questions) ----------------------------------------------------
     def to_english(self, text: str, lang: str) -> str | None:
         if lang == "en":

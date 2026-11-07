@@ -156,9 +156,11 @@ def test_spanish_end_to_end_with_mocked_model():
     cached = CachedExtractor(json.loads((SAMPLES / "overcharge" / "extraction.json").read_text()))
     with TestClient(create_app(Settings(), llm=FnLLM(fn), extractor=cached)) as c:
         cid, a = confirmed_audit(c, lang="es")
-        assert a["findings"][0]["translated"]["headline"].startswith("[es]") and a["findings"][0]["explanation_source"] == "fallback"
+        f0 = a["findings"][0]
+        assert f0["translated"]["headline"] != f0["explanation"]["headline"] and "[[" not in f0["translated"]["headline"]
+        assert f0["explanation_source"] == "fallback" and not f0["translation_notice"]
         ans = c.post(f"/cases/{cid}/ask", json={"question": "¿Cuánto debo?", "language": "es"}).json()
-        assert ans["verified"] and ans["answer"].startswith("[es]") and "$412.00" in ans["answer"]
+        assert ans["verified"] and ans["answer"] != ans["answer_en"] and "$412.00" in ans["answer"]
         lt = c.get(f"/cases/{cid}/letter", params={"lang": "es"}).json()
         assert lt["segments"] and all("$412.00" in s["translated"] for s in lt["segments"] if s["section"] == "total")
 

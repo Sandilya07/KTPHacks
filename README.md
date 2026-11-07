@@ -71,6 +71,12 @@ The six screens: language picker and welcome; upload (two drop zones, camera cap
 
 Accessibility choices: 18px base type, high contrast, one primary action per screen, keyboard navigable with a skip link and focus moved to each screen's heading, ARIA labels and live regions, reduced-motion respected, works at 375px width, plain error messages with a manual-entry fallback, and loading states that always show progress text. Interface text for Spanish and Mongolian is a **draft that needs native review**. Browsers have few Mongolian voices, so dictation and read-aloud say so instead of failing.
 
+## Demo mode and the translation cache
+
+`DEMO_MODE=1` never calls a model. The sample cases replay stored extractions, explanations come from the deterministic templates, and translations come from `i18n/demo_cache_es.json` and `i18n/demo_cache_mn.json`: hand-written translations keyed by the *masked* English sentence (numbers replaced by tokens), so they are reused for any amounts and still pass the number-integrity check. `tests/test_demo_cache.py` fails if any sentence the three demo cases show is missing from either cache, and `python scripts/dump_demo_strings.py` prints the sentences that need a translation after a template changes.
+
+**The Spanish and Mongolian caches were written by Claude and have not been reviewed by a native speaker.** Read `i18n/demo_cache_mn.json` before presenting in Mongolian.
+
 ## Setup
 
 Requires Python 3.11 or newer.
@@ -102,7 +108,7 @@ make test
 | `make lint` | ruff |
 | `make data` | Generate 20 synthetic bills and EOBs (PDF and phone-photo JPEG) with ground truth into `data/synthetic/` |
 | `make web-test` | Playwright end-to-end and axe tests (starts the API in `DEMO_MODE` and the dev server itself) |
-| `make eval` | Run all evaluation scripts (audit, extraction, explainer, multilingual); each prints PASS or FAIL, and says whether it used a live model or an offline stand-in |
+| `make eval` | Prints one results table (extraction accuracy, seeded-error recall, false positives on clean bills, explainer validator fallback rate, translation integrity), with a column saying how each number was measured: live model, offline stand-in, or not measured. The detailed scripts are in `scripts/eval_*.py` |
 
 ## CMS data and licensing
 

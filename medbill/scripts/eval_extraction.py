@@ -63,46 +63,55 @@ def row(label, s):
             f"wrong-but-flagged {s['flagged_wrong']:>3}  SILENT errors {s['silent']:>3}")
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--extractor", choices=["text", "llm", "auto"], default="auto")
-    args = ap.parse_args()
+def compute(extractor_choice: str = "auto") -> dict | None:
     cases = [json.loads(p.read_text()) | {"dir": p.parent} for p in sorted((ROOT / "data" / "synthetic").glob("*/truth.json"))]
     if not cases:
-        print("No synthetic data. Run: make data")
-        return 2
+        return None
     have_key = bool(os.environ.get("ANTHROPIC_API_KEY"))
-    mode = args.extractor if args.extractor != "auto" else ("llm" if have_key else "text")
+    mode = extractor_choice if extractor_choice != "auto" else ("llm" if have_key else "text")
     if mode == "llm" and not have_key:
-        print("ANTHROPIC_API_KEY is not set: cannot run the llm extractor.")
-        return 2
+        return {"error": "ANTHROPIC_API_KEY is not set: cannot run the llm extractor."}
     if mode == "llm":
         from extraction.llm import AnthropicExtractor
         extractor = AnthropicExtractor()
     else:
         extractor = TextLayerExtractor()
-    print(f"Extractor: {mode}\n")
-    ok = True
-    variants = [("clean PDF", "pdf", 95.0)]
-    if mode == "llm":
-        variants.append(("photo", "jpg", 85.0))
+    out: dict = {"mode": mode, "variants": {}}
+    variants = [("clean PDF", "pdf", 95.0)] + ([("photo", "jpg", 85.0)] if mode == "llm" else [])
     for label, ext, target in variants:
         total = {"fields": 0, "correct": 0, "lines": 0, "found": 0, "silent": 0, "flagged_wrong": 0}
+        per = {}
         for kind in ("bill", "eob"):
             files = [(c["dir"] / (f"{kind}.pdf" if ext == "pdf" else f"{kind}_photo.jpg"), c[kind]) for c in cases]
-            s = evaluate(extractor, files, kind)
-            print(row(f"{label} {kind}", s))
+            per[kind] = evaluate(extractor, files, kind)
             for k in total:
-                total[k] += s[k]
-        print(row(f"{label} OVERALL", total))
+                total[k] += per[kind][k]
         acc = 100 * total["correct"] / total["fields"]
-        verdict = acc >= target and total["silent"] == 0
-        ok &= verdict
-        print(f"  target >= {target:.0f}% and zero silent errors: {'PASS' if verdict else 'FAIL'}\n")
-    if mode == "text":
+        out["variants"][label] = {"per": per, "total": total, "accuracy": acc, "target": target,
+                                  "pass": acc >= target and total["silent"] == 0}
+    return out
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--extractor", choices=["text", "llm", "auto"], default="auto")
+    r = compute(ap.parse_args().extractor)
+    if r is None:
+        print("No synthetic data. Run: make data")
+        return 2
+    if "error" in r:
+        print(r["error"])
+        return 2
+    print(f"Extractor: {r['mode']}\n")
+    for label, v in r["variants"].items():
+        for kind, st in v["per"].items():
+            print(row(f"{label} {kind}", st))
+        print(row(f"{label} OVERALL", v["total"]))
+        print(f"  target >= {v['target']:.0f}% and zero silent errors: {'PASS' if v['pass'] else 'FAIL'}\n")
+    if r["mode"] == "text":
         print("Photo variants were NOT evaluated: they need the vision model (set ANTHROPIC_API_KEY, "
               "rerun with --extractor llm).")
-    return 0 if ok else 1
+    return 0 if all(v["pass"] for v in r["variants"].values()) else 1
 
 
 if __name__ == "__main__":
