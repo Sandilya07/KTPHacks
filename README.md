@@ -28,7 +28,7 @@ are next. This README is updated as each part lands.
 | 1 | Deterministic audit core | `medbill/audit/` |
 | 2 | Pydantic models, rule registry, CMS data loaders, extraction pipeline, synthetic data and evals | `audit/`, `extraction/`, `scripts/` |
 | 3 | Explainer with validator and template fallback, dispute letter (text and PDF) | `explain/` |
-| 4 (partial) | Number-integrity placeholder layer, per-language glossaries (Spanish, Mongolian), translator with token/glossary checks and a back-translation check, offline translation cache | `i18n/` |
+| 4 (partial) | Number-integrity placeholder layer, per-language glossaries (Spanish, Mongolian), translator with token/glossary checks and a back-translation check, offline translation cache, grounded multilingual Q&A (intent routing, case-only retrieval with citations, deferral and medical/legal redirects) | `i18n/` |
 
 Rules (one file each in `audit/rules/`, auto-registered): duplicate charge, unbundling (NCCI), excess units (MUE),
 EOB mismatch and balance billing, missing EOB line, price outlier (Medicare fee schedule, always `ask`), balance arithmetic.
@@ -85,6 +85,8 @@ not redistributed here.
 | Clean-PDF extraction (text-layer extractor) | 100% field accuracy |
 | Photo extraction | **not measured** (needs `ANTHROPIC_API_KEY` and the vision model) |
 | Explainer validator, 20 findings, simulated LLM | 0 accepted texts with an invented number, code or banned word; template fallback fires on a fixed schedule to prove the safety net |
+
+Q&A: questions are translated to English (numbers placeholdered), routed to one of six supported answer types or a glossary-term definition, and answered from the case data only. Anything else, including coverage and personal-plan questions ("will my insurance cover...", "what is my deductible"), gets a fixed deferral phrase pointing to the billing office; medical and legal questions get a fixed redirect. Without a model, Spanish and Mongolian questions are still routed by keyword hints in the glossary files, and the answer is shown in English with a notice.
 
 Translation safety (unit-tested with deliberately corrupted numbers): the model only sees placeholder tokens, never raw amounts, codes or dates; dropped, duplicated, invented or mangled tokens and stray digits are rejected, then a back-translation to English must carry the same multiset of numbers and codes. On failure it retries once, then shows the English text with a notice. Known limit: two amounts swapped in position keep the same multiset, so that case is not detectable.
 
