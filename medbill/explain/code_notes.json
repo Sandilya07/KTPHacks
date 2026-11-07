@@ -1,0 +1,14 @@
+{
+  "_comment": "Our own plain-language summaries (not AMA CPT text). Keyed by code number.",
+  "99213": "A routine office visit with a doctor for a patient the office has seen before.",
+  "99214": "A longer or more involved office visit with a doctor for an existing patient.",
+  "80053": "A blood test that checks several body chemicals at once, including blood sugar and kidney function.",
+  "82947": "A blood test for sugar (glucose). It is also part of the larger blood chemistry panel.",
+  "82565": "A blood test for creatinine, a sign of how well the kidneys are working.",
+  "85025": "A complete blood count: a blood test that counts the different kinds of blood cells.",
+  "93000": "A heart tracing test (electrocardiogram) with a report.",
+  "71046": "A chest x-ray with two views.",
+  "80061": "A blood test for cholesterol and related fats.",
+  "83036": "A blood test showing average blood sugar over the past few months.",
+  "36415": "Drawing blood from a vein for lab tests."
+}

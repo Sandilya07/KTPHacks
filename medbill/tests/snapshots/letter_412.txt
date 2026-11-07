@@ -1,0 +1,46 @@
+[Your name]
+[Your address]
+
+2026-01-15
+
+Synthetic Family Clinic - Billing Department
+Re: Request for review of account ACCT-0001
+
+I am writing to ask your billing department to review my account. After comparing my
+itemized bill with my insurance statement, I found 3 charges that I would like you to look
+at. The total amount in question is $412.00.
+
+Disputed charges
+1. 2024-03-05 | code 80053 | billed $95.00 | patient owed $95.00 | EOB says: Lists this
+   service once on this date; patient responsibility $20.00 | reason: Code 80053 appears on
+   2024-03-05 in lines B2 and B3. | amount in question $95.00
+2. 2024-03-05 | code 82947 | billed $110.00 | patient owed $110.00 | EOB says: Denied
+   Bundled; patient responsibility $0.00 | reason: Codes 80053 and 82947 were billed on
+   2024-03-05. 80053 and 82947 are normally not billed together on the same day. | amount in
+   question $110.00
+3. 2024-04-12 | code 99214 | billed $400.00 | patient owed $247.00 | EOB says: Allowed
+   $200.00; patient responsibility $40.00 | reason: Bill line B5 asks the patient for
+   247.00; EOB line E4 says patient responsibility is 40.00. | amount in question $207.00
+
+Total amount in question: $412.00
+
+Rules and limits used
+- duplicate charge: Duplicate rule: same code and date of service (80053, 2024-03-05)
+- unbundling: NCCI PTP edit: column 1 80053, column 2 82947, modifier indicator 1, effective
+  1996-01-01
+- eob mismatch: EOB patient responsibility for 99214 on 2024-04-12
+
+I am requesting:
+1. A corrected statement that reflects the review of the lines above.
+2. An itemized bill that lists every charge with its code.
+3. A hold on collections and credit reporting for this account while the review is open.
+4. A written response within 30 days.
+
+Thank you for your time. I would appreciate a written reply and, if the charges are correct,
+a short explanation so I can understand them.
+
+This letter is a request for review. I am not making an accusation, and I understand the
+charges above may have an explanation I have not seen.
+
+Sincerely,
+[Your name]
