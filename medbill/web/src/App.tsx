@@ -35,6 +35,14 @@ export default function App() {
     setCopy(values ? translatedStrings(code, values) : null)
   }
 
+  // While the intro is up, the app behind it is removed from layout, focus order and the page height.
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-intro', intro)
+    if (intro) return
+    // A link like /#language-support could not scroll while the app was hidden; do it once the intro closes.
+    const target = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null
+    if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }))
+  }, [intro])
   useEffect(() => { getConfig().then(setConfig).catch(() => setConfigError('The server is not reachable. Please start the API and reload.')) }, [])
   useEffect(() => { document.documentElement.lang = lang; document.documentElement.dir = languageDirection(lang) }, [lang])
   // Move focus to the new screen's heading when the step changes (not on first load, and not when the

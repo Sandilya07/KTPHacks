@@ -284,3 +284,9 @@
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   .art-pulse path { stroke-dashoffset: 0; }
 }
+
+/* Intro overlay: nothing behind it is visible, focusable or scrollable. */
+html[data-intro] .privacy-banner,
+html[data-intro] .app-header,
+html[data-intro] .app-shell,
+html[data-intro] a[href="#main"] { display: none !important; }
