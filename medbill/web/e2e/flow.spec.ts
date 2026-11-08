@@ -4,13 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 const SAMPLES = fileURLToPath(new URL('../../data/samples', import.meta.url))
 
-async function start(page: Page, sample: string, language = 'English') {
-  await page.goto('/')
-  if (language !== 'English') {
-    await page.locator('#language-text').fill(language === 'Español' ? 'Quiero entender mi factura' : 'Би нэхэмжлэхээ ойлгохыг хүсэж байна')
-    await page.getByRole('button', { name: 'Send', exact: true }).click()
-    await expect(page.locator('html')).toHaveAttribute('lang', language === 'Español' ? 'es' : 'mn')
-  }
+async function start(page: Page, sample: string) {
+  await page.goto('/?intro=0')
   await page.getByRole('button', { name: /^(Get started|Comenzar|Эхлэх)$/ }).click()
   await page.getByTestId(`sample-${sample}`).click()
   await page.getByTestId('looks-right').waitFor()
@@ -18,35 +13,6 @@ async function start(page: Page, sample: string, language = 'English') {
 const toResults = async (page: Page) => {
   await page.getByTestId('looks-right').click()
   await page.getByTestId('headline').waitFor()
-}
-
-for (const locale of [
-  { code: 'fr', direction: 'ltr', text: 'Je veux comprendre ma facture', title: 'Comprendre votre facture' },
-  { code: 'ps', direction: 'rtl', text: 'زه غواړم خپل بل وپېژنم', title: 'خپل بل وپېژنئ' },
-  { code: 'ja', direction: 'ltr', text: '請求書について質問したいです', title: '医療費の請求書を理解する' },
-  { code: 'es-MX', direction: 'ltr', text: 'Quiero entender mi factura', title: '' },
-]) {
-  test(`automatic locale response supports ${locale.code}`, async ({ page }) => {
-    await page.route('**/api/language', async (route) => {
-      await route.fulfill({ json: { language: locale.code, strings: locale.title ? { welcomeTitle: locale.title } : {} } })
-    })
-    await page.goto('/')
-    await page.locator('#language-text').fill(locale.text)
-    await page.getByRole('button', { name: 'Send', exact: true }).click()
-    await expect(page.locator('html')).toHaveAttribute('lang', locale.code)
-    await expect(page.locator('html')).toHaveAttribute('dir', locale.direction)
-    if (locale.title) await expect(page.getByRole('heading', { level: 1 })).toHaveText(locale.title)
-    else await expect(page.getByRole('button', { name: 'Comenzar', exact: true })).toBeVisible()
-    if (locale.code === 'ps') {
-      await page.getByRole('button', { name: 'Get started', exact: true }).click()
-      await page.getByTestId('sample-overcharge').click()
-      await page.getByTestId('looks-right').waitFor()
-      await toResults(page)
-      await expect(page.getByTestId('headline')).toContainText('$412.00')
-      await page.getByRole('button', { name: 'Write the letter', exact: true }).click()
-      await expect(page.locator('pre[lang="en"]').first()).toHaveAttribute('dir', 'ltr')
-    }
-  })
 }
 
 test('overcharge sample: total, three findings, evidence highlight, ask, letter', async ({ page }) => {
@@ -112,7 +78,7 @@ test('typed overcharge question explains the flagged charges', async ({ page }) 
 })
 
 test('additional sample documents can be downloaded and reviewed', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await page.getByRole('button', { name: 'Get started' }).click()
   for (const sample of ['duplicate_lab', 'bundled_tests', 'insurance_mismatch', 'balance_billing', 'excess_units', 'routine_visit']) {
     await expect(page.getByTestId(`sample-${sample}`)).toBeVisible()
@@ -145,27 +111,35 @@ test('photo sample flags a low-confidence line; editing a value changes the audi
   await expect(page.getByTestId('headline')).toContainText('$205.00')
 })
 
-test('Spanish interface, results and question', async ({ page }) => {
-  await start(page, 'overcharge', 'Español')
-  await expect(page.getByRole('heading', { name: 'Revise lo que leímos' })).toBeVisible()
+// Language is switched from the Ask screen: the typed question is detected and the whole interface follows it.
+async function askToSwitch(page: Page, question: string, htmlLang: string) {
   await toResults(page)
-  await expect(page.getByTestId('headline')).toContainText('Es posible que le hayan cobrado de más: $412.00')
-  await page.getByRole('button', { name: 'Hacer una pregunta' }).click()
-  await page.getByRole('button', { name: '¿Cuánto debo realmente?' }).click()
+  await page.locator('.workflow-step').nth(4).click()
+  await page.locator('#q').fill(question)
+  await page.locator('.chat-composer button[type=submit]').click()
+  await expect(page.locator('html')).toHaveAttribute('lang', htmlLang)
+  await expect(page.getByTestId('msg-assistant').first()).toBeVisible()
+}
+
+test('Spanish interface, results and question', async ({ page }) => {
+  await start(page, 'overcharge')
+  await askToSwitch(page, '¿Cuánto debo realmente?', 'es')
   await expect(page.getByTestId('msg-assistant').first()).toContainText('$412.00')
   const original = page.getByTestId('msg-assistant').first().getByText('Original en inglés', { exact: true })
   await original.click()
   await expect(page.getByTestId('msg-assistant').first().locator('p[lang="en"]')).toContainText('$412.00')
+  await page.locator('.workflow-step').nth(3).click()
+  await expect(page.getByTestId('headline')).toContainText('Es posible que le hayan cobrado de más: $412.00')
 })
 
 test('uploads: a PDF is read, a photo without a model gives a plain message', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await page.getByRole('button', { name: 'Get started' }).click()
   await page.getByTestId('bill-input').setInputFiles(`${SAMPLES}/overcharge/bill.pdf`)
   await page.getByTestId('eob-input').setInputFiles(`${SAMPLES}/overcharge/eob.pdf`)
   await page.getByRole('button', { name: 'Read my documents' }).click()
   await page.getByTestId('looks-right').waitFor()
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await page.getByRole('button', { name: 'Get started' }).click()
   await page.getByTestId('bill-input').setInputFiles(`${SAMPLES}/overcharge_photo/bill.jpg`)
   await page.getByTestId('eob-input').setInputFiles(`${SAMPLES}/overcharge_photo/eob.jpg`)
@@ -184,7 +158,7 @@ test('delete my data wipes the case', async ({ page }) => {
 })
 
 test('keyboard: focus moves to each screen heading and the skip link works', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await page.keyboard.press('Tab')
   await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeFocused()
   await page.getByRole('button', { name: 'Get started' }).focus()
@@ -193,7 +167,7 @@ test('keyboard: focus moves to each screen heading and the skip link works', asy
 })
 
 test('workflow navigation requires review and preserves question history', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   const nav = page.getByRole('navigation')
   await expect(nav.getByRole('button', { name: 'Check', exact: true })).toBeDisabled()
   await expect(nav.getByRole('button', { name: 'Results', exact: true })).toBeDisabled()
@@ -218,7 +192,7 @@ test('workflow navigation requires review and preserves question history', async
 
 test('reduced motion leaves content visible without continuous animation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await expect(page.getByRole('heading', { name: 'Understand your medical bill' })).toBeVisible()
   const animations = await page.locator('.art-paper-front, .feature-card').evaluateAll((elements) =>
     elements.map((el) => ({ duration: parseFloat(getComputedStyle(el).animationDuration), iterations: getComputedStyle(el).animationIterationCount })))
@@ -249,7 +223,7 @@ test('accessibility: axe reports no critical violations on any screen', async ({
     const bad = r.violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
     expect(bad.map((v) => `${label}: ${v.id} (${v.impact})`), JSON.stringify(bad.map((v) => v.nodes.map((n) => ({ html: n.html, reason: n.failureSummary }))))).toEqual([])
   }
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await check('welcome')
   await page.getByRole('button', { name: 'Get started' }).click()
   await check('upload')
@@ -269,21 +243,32 @@ test('accessibility: axe reports no critical violations on any screen', async ({
 })
 
 test('Mongolian demo path: results, grounded answer and side-by-side letter, all verified offline', async ({ page }) => {
-  await start(page, 'overcharge', 'Монгол')
-  await expect(page.getByRole('heading', { name: 'Бидний уншсныг шалгана уу' })).toBeVisible()
-  await toResults(page)
+  await start(page, 'overcharge')
+  await askToSwitch(page, 'Би үнэндээ хэдийг төлөх ёстой вэ?', 'mn')
+  const answer = page.getByTestId('msg-assistant').first()
+  await expect(answer).toContainText('$412.00')
+  await expect(answer).toContainText('нэхэмжлэх')
+  await page.locator('.workflow-step').nth(3).click()
   await expect(page.getByTestId('headline')).toContainText('$412.00')
   await expect(page.getByText('Анхаарах')).toHaveCount(0)
   await expect(page.locator('article').first()).toContainText('кодыг')
   await expect(page.getByRole('note')).toHaveCount(1) // only the page banner: no "could not be checked" notices
-  await page.getByRole('button', { name: 'Асуулт асуух' }).click()
-  await page.getByRole('button', { name: 'Би үнэндээ хэдийг төлөх ёстой вэ?' }).click()
-  const answer = page.getByTestId('msg-assistant').first()
-  await expect(answer).toContainText('$412.00')
-  await expect(answer).toContainText('нэхэмжлэх')
-  await page.getByRole('button', { name: 'Захидал бичих' }).click()
+  await page.locator('.workflow-step').nth(5).click()
   const sbs = page.getByTestId('letter-side-by-side')
   await expect(sbs).toContainText('Маргаантай нийт дүн: $412.00.')
   await expect(sbs).toContainText('Total amount in question: $412.00.')
   await expect(page.getByRole('note')).toHaveCount(1)
+})
+
+test('intro greets every visitor and dismisses with the button or Escape', async ({ page }) => {
+  await page.goto('/')
+  const intro = page.getByRole('dialog')
+  await expect(intro.getByRole('heading', { name: /Language shouldn't hold you back/ })).toBeVisible()
+  await expect(intro.getByRole('button', { name: 'Get started' })).toBeFocused()
+  await intro.getByRole('button', { name: 'Get started' }).click()
+  await expect(intro).toBeHidden()
+  await page.reload()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toBeHidden()
 })

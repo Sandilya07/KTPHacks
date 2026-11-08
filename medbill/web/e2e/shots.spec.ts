@@ -8,7 +8,7 @@ test('screens', async ({ page }, info) => {
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: `${dir}/${info.project.name}-${n}.png`, fullPage: true, animations: 'disabled' })
   }
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await shot('1-welcome')
   await page.getByRole('button', { name: 'Get started' }).click()
   await shot('2-upload')

@@ -3,12 +3,12 @@ import { defineConfig, devices } from '@playwright/test'
 // Starts the API in DEMO_MODE (no network, no model) and the Vite dev server.
 // Set PY to the Python that has the backend dependencies installed (default: python3).
 const py = process.env.PY ?? 'python3'
-const apiPort = Number(process.env.MEDBILL_API_PORT ?? 18181)
-const webPort = Number(process.env.MEDBILL_WEB_PORT ?? 15174)
+const apiPort = Number(process.env.MEDBILL_API_PORT ?? process.env.API_PORT ?? 18181)
+const webPort = Number(process.env.MEDBILL_WEB_PORT ?? process.env.WEB_PORT ?? 15174)
 if (![apiPort, webPort].every((port) => Number.isInteger(port) && port > 0 && port < 65536) || apiPort === webPort) {
   throw new Error('Choose distinct, valid API and web ports.')
 }
-const baseURL = `http://127.0.0.1:${webPort}`
+const baseURL = process.env.BASE_URL ?? `http://127.0.0.1:${webPort}`
 
 export default defineConfig({
   testDir: './e2e',

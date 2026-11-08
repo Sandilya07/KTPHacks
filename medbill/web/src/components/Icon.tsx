@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react'
 
-export type IconName = 'cross' | 'pulse' | 'upload' | 'document' | 'check' | 'shield' | 'message' | 'letter' | 'arrow' | 'globe' | 'trash' | 'search' | 'home'
+export type IconName = 'cross' | 'pulse' | 'upload' | 'document' | 'check' | 'shield' | 'message' | 'letter' | 'arrow' | 'globe' | 'trash' | 'search' | 'home' | 'heart'
 
 const paths: Record<IconName, React.ReactNode> = {
+  heart: <path d="M12 20s-8-4.8-8-10.5A4.5 4.5 0 0112 7a4.5 4.5 0 018 2.5C20 15.2 12 20 12 20z" />,
   cross: <path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z" />,
   pulse: <path d="M2 12h5l3-8 4 16 3-8h5" />,
   upload: <><path d="M12 16V3m-5 5 5-5 5 5M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5" /></>,

@@ -4,6 +4,7 @@ import { type Strings, interfaceText } from '../strings'
 import { createCase, detectLanguage } from '../api'
 import { Screen } from '../components/Chrome'
 import Icon, { MedicalArt, type IconName } from '../components/Icon'
+import { LiquidAccordion } from '@/components/ui/liquid-glass-accordion'
 
 interface Props { s: Strings; config: Config; lang: string; setLang: (l: string, values?: Record<string, string>) => void; onStart: () => void; onExample: (kase: CaseView) => void }
 const featureIcons: IconName[] = ['document', 'globe', 'letter']
@@ -68,5 +69,9 @@ export default function Welcome({ s, config, lang, setLang, onStart, onExample }
         {config.demo_mode && <p className="demo-label">Offline demo: English / Español / Монгол</p>}
       </form>
     </div>
+    <section className="faq-band" aria-labelledby="faq-title">
+      <h2 id="faq-title">{s.faqTitle}</h2>
+      <LiquidAccordion tone="dark" defaultOpen={0} headingLevel={3} items={s.faqItems} style={{ maxWidth: 680 }} />
+    </section>
   </Screen>
 }

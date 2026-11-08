@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { createManual, deleteCase, getConfig } from './api'
 import { Banner, ErrorBox, Screen, Spinner, Stepper } from './components/Chrome'
+import { AnimatePresence } from 'framer-motion'
 import Icon from './components/Icon'
+import Intro from './components/Intro'
+import ShaderBackground from './components/ShaderBackground'
 import Ask, { type Msg } from './screens/Ask'
 import Letter from './screens/Letter'
 import Results from './screens/Results'
@@ -16,6 +19,8 @@ export default function App() {
   const [configError, setConfigError] = useState('')
   const [lang, setLang] = useState('en')
   const [step, setStep] = useState(0)
+  // The intro shows on every visit; `?intro=0` skips it (used by the automated browser tests).
+  const [intro, setIntro] = useState(() => new URLSearchParams(location.search).get('intro') !== '0')
   const [kase, setCase] = useState<CaseView | null>(null)
   const [audit, setAudit] = useState<AuditResult | null>(null)
   const [auditKey, setAuditKey] = useState('')
@@ -31,6 +36,14 @@ export default function App() {
     setCopy(values ? translatedStrings(code, values) : null)
   }
 
+  // While the intro is up, the app behind it is removed from layout, focus order and the page height.
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-intro', intro)
+    if (intro) return
+    // A link like /#language-support could not scroll while the app was hidden; do it once the intro closes.
+    const target = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null
+    if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }))
+  }, [intro])
   useEffect(() => { getConfig().then(setConfig).catch(() => setConfigError('The server is not reachable. Please start the API and reload.')) }, [])
   useEffect(() => { document.documentElement.lang = lang; document.documentElement.dir = languageDirection(lang) }, [lang])
   // Move focus to the new screen's heading when the step changes (not on first load, and not when the
@@ -54,6 +67,9 @@ export default function App() {
 
   return (
     <>
+      <AnimatePresence>{intro && <Intro key="intro" onDone={() => setIntro(false)} />}</AnimatePresence>
+      {/* Same "Mesh drift" shader as the intro, rendered small and capped at 30fps as a calm backdrop for the whole app. */}
+      {!intro && <div className="app-backdrop" aria-hidden><ShaderBackground resolution={0.4} fps={30} /></div>}
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3">{s.skip}</a>
       <Banner s={s} />
       <header className="app-header">
