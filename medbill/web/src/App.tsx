@@ -73,7 +73,7 @@ export default function App() {
         <div className="page-transition" key={step}>
         {configError && <Screen title={s.errorTitle}><ErrorBox s={s} message={configError} onRetry={() => location.reload()} /></Screen>}
         {!config && !configError && <Screen title={s.appName}><Spinner message={s.loading} /></Screen>}
-        {config && step === 0 && <Welcome s={s} config={config} lang={lang} setLang={languageChanged} onStart={() => setStep(1)} />}
+        {config && step === 0 && <Welcome s={s} config={config} lang={lang} setLang={languageChanged} onStart={() => setStep(1)} onExample={(c) => { setCase(c); setAudit(null); setAuditKey(''); setMsgs([]); setHighlight({ ids: [], nonce: 0 }); setStep(2) }} />}
         {config && step === 1 && <Upload s={s} config={config} onCase={(c) => { setCase(c); setStep(2) }} onBack={() => setStep(0)} onManual={() => createManual().then((c) => { setCase(c); setStep(2) })} />}
         {config && step === 2 && kase && <Review key={kase.case_id} s={s} kase={kase} onConfirmed={(c) => { setCase(c); setAudit(null); setAuditKey(''); setMsgs([]); setHighlight({ ids: [], nonce: 0 }); setStep(3) }} onBack={() => setStep(1)} />}
         {config && step === 3 && kase && <Results s={s} lang={lang} kase={kase} audit={audit} auditKey={auditKey} setAudit={(a, k) => { setAudit(a); setAuditKey(k) }} highlight={highlight} setHighlight={setHighlight} onAsk={() => setStep(4)} onLetter={() => setStep(5)} onBack={() => setStep(2)} />}

@@ -9,6 +9,7 @@ from pathlib import Path
 from audit.cms_data import get_cms_data
 from audit.engine import run_case
 from audit.models import Bill, BillLine, Eob, EobLine
+from audit.reconcile import reconciliation
 from audit.rules import load_rules
 from explain.explainer import Explainer
 from extraction.cached import CachedExtractor
@@ -144,6 +145,11 @@ def _next_id(prefix: str, lines) -> str:
 
 
 def apply_edits(rec: Record, body: dict) -> None:
+    with rec.lock:
+        _apply_edits(rec, body)
+
+
+def _apply_edits(rec: Record, body: dict) -> None:
     """Apply user corrections. Edited lines are re-validated and count as user-confirmed."""
     c = rec.case
     try:
@@ -200,6 +206,7 @@ def _audit_payload(rec: Record, llm: LLMClient | None, settings: Settings, lang:
         items.append(item)
     data = get_cms_data()
     return {"case_id": case.case_id, "total_impact": case.total_impact, "findings": items,
+            "reconciliation": reconciliation(case),
             "no_errors": not case.findings, "only_questions": bool(case.findings) and case.total_impact == 0,
             "checked": [RULE_LABEL.get(r.NAME, r.NAME) for r in load_rules()],
             "rules_data": data.parts or {"all": data.source},

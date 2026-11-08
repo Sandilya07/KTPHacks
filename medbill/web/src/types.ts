@@ -22,6 +22,23 @@ export interface Finding {
 export interface AuditResult {
   case_id: string; total_impact: number; findings: Finding[]; no_errors: boolean; only_questions: boolean
   checked: string[]; rules_data: Record<string, string>
+  reconciliation: Reconciliation
+}
+export interface ReconciliationRow {
+  bill_id: string; eob_id: string | null; code: string; date: string; eob_date: string | null
+  bill_owed: number; eob_responsibility: number | null; difference: number | null
+  match_basis: 'exact' | 'date' | 'code' | 'unmatched'; finding_ids: string[]; line_ids: string[]
+}
+export interface Reconciliation {
+  bill_balance: number; bill_line_total: number; balance_matches_lines: boolean
+  eob_total: number | null; statement_difference: number | null; matched_lines: number; total_lines: number
+  rows: ReconciliationRow[]; unmatched_eob: { id: string; code: string; date: string; patient_responsibility: number }[]
+  tiers: Record<Finding['tier'], { count: number; impact: number }>
+}
+export interface CorrectionResult {
+  preview_only: boolean; line_id: string; original_line_amount: number; proposed_line_amount: number
+  original_balance: number; proposed_balance: number; original_impact: number; proposed_impact: number
+  impact_change: number; resolved_finding_ids: string[]; new_finding_ids: string[]; remaining_finding_count: number
 }
 export interface AskResult { answer: string; answer_en?: string; language: string; kind: string; citations: string[]; deferred: boolean; verified: boolean; notice: string }
 export interface LetterSegment { section: string; english: string; translated: string; verified: boolean; notice: string }

@@ -3,6 +3,7 @@ import { getLetter, letterUrl } from '../api'
 import { ErrorBox, Screen, Spinner } from '../components/Chrome'
 import type { Strings } from '../strings'
 import type { CaseView, LetterResult } from '../types'
+import { EvidenceDownload } from '../components/ReviewTools'
 
 interface Props { s: Strings; lang: string; kase: CaseView; onBack: () => void }
 
@@ -83,6 +84,7 @@ export default function Letter({ s, lang, kase, onBack }: Props) {
         <button type="button" className="btn-secondary" onClick={onBack}>{s.back}</button>
       </div>
       <p role="status" aria-live="polite" className="sr-only">{copied ? s.copied : ''}</p>
+      <EvidenceDownload s={s} caseId={kase.case_id} />
     </Screen>
   )
 }

@@ -1,4 +1,4 @@
-import type { AskResult, AuditResult, CaseView, Config, LetterResult } from './types'
+import type { AskResult, AuditResult, CaseView, Config, CorrectionResult, LetterResult } from './types'
 
 const BASE = '/api'
 
@@ -50,6 +50,19 @@ export const patchLines = (id: string, body: object) =>
 export const confirmCase = (id: string) => fetch(`${BASE}/cases/${id}/confirm`, { method: 'POST' }).then((r) => json<CaseView>(r))
 export const runAudit = (id: string, lang: string, onProgress: (m: string) => void) =>
   streamPost<AuditResult>(`/cases/${id}/audit?lang=${lang}`, undefined, onProgress)
+export const previewCorrection = (id: string, line_id: string, patient_owed: number) =>
+  fetch(`${BASE}/cases/${id}/preview`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ line_id, patient_owed }) })
+    .then((r) => json<CorrectionResult>(r))
+
+export async function downloadEvidenceReport(id: string) {
+  const response = await fetch(`${BASE}/cases/${id}/report`)
+  if (!response.ok) { await json(response); return }
+  const url = URL.createObjectURL(await response.blob())
+  const link = document.createElement('a')
+  link.href = url; link.download = 'medbill-evidence-report.pdf'
+  document.body.append(link); link.click(); link.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
 export const askQuestion = (id: string, question: string, language = 'auto', history: { role: 'user' | 'assistant'; text: string }[] = []) =>
   fetch(`${BASE}/cases/${id}/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, language, history }) }).then((r) => json<AskResult>(r))
 export const letterUrl = (id: string, p: Record<string, string>) => `${BASE}/cases/${id}/letter?${new URLSearchParams(p)}`

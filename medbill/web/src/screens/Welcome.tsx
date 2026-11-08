@@ -1,17 +1,25 @@
 import { useState } from 'react'
-import type { Config } from '../types'
+import type { CaseView, Config } from '../types'
 import { type Strings, interfaceText } from '../strings'
-import { detectLanguage } from '../api'
+import { createCase, detectLanguage } from '../api'
 import { Screen } from '../components/Chrome'
 import Icon, { MedicalArt, type IconName } from '../components/Icon'
 
-interface Props { s: Strings; config: Config; lang: string; setLang: (l: string, values?: Record<string, string>) => void; onStart: () => void }
+interface Props { s: Strings; config: Config; lang: string; setLang: (l: string, values?: Record<string, string>) => void; onStart: () => void; onExample: (kase: CaseView) => void }
 const featureIcons: IconName[] = ['document', 'globe', 'letter']
 
-export default function Welcome({ s, config, lang, setLang, onStart }: Props) {
+export default function Welcome({ s, config, lang, setLang, onStart, onExample }: Props) {
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
+  async function example() {
+    if (busy) return
+    setBusy(true); setNotice('')
+    const form = new FormData(); form.append('sample', 'overcharge')
+    try { onExample(await createCase(form, () => {})) }
+    catch (e) { setNotice(e instanceof Error ? e.message : s.tryAgain) }
+    finally { setBusy(false) }
+  }
   async function detect() {
     if (text.trim().length < 2 || busy) return
     setBusy(true); setNotice('')
@@ -42,6 +50,10 @@ export default function Welcome({ s, config, lang, setLang, onStart }: Props) {
         <div><h2>{s.featureTitles[i]}</h2><p>{point}</p></div>
       </div>)}
     </div>
+    <section className="example-strip" aria-labelledby="example-title">
+      <span className="example-symbol"><Icon name="search" /></span><div><h2 id="example-title">{s.exampleTitle}</h2><p>{s.exampleHelp}</p></div>
+      <button className="btn-secondary" type="button" disabled={busy} onClick={() => void example()} data-testid="welcome-example">{busy ? s.loading : s.tryExample}<Icon name="arrow" className="directional-icon" /></button>
+    </section>
     <div className="card language-panel" id="language-support">
       <div className="language-intro"><span className="language-symbol" aria-hidden>文<span>/</span>A</span>
         <h2>{s.languageTitle}</h2><p>{s.languageHelp}</p>

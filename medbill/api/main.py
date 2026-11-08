@@ -51,6 +51,11 @@ class AskBody(BaseModel):
     history: list[ChatTurn] = Field(default_factory=list, max_length=8)
 
 
+class PreviewBody(BaseModel):
+    line_id: str = Field(min_length=1, max_length=80)
+    patient_owed: float = Field(ge=0, le=10000000, allow_inf_nan=False)
+
+
 class LanguageBody(BaseModel):
     text: str = Field(min_length=2, max_length=4000)
     strings: dict[str, str] = Field(default_factory=dict, max_length=250)
@@ -243,6 +248,40 @@ def create_app(settings: Settings | None = None, llm: LLMClient | None = None, e
         return sse(events) if stream else await collect(events)
 
     # ---- ask -------------------------------------------------------------------------------------
+    @app.post("/cases/{cid}/preview")
+    async def preview(cid: str, body: PreviewBody):
+        from audit.reconcile import preview_correction
+        r = rec(cid)
+        if not r.case.confirmed:
+            raise HTTPException(409, "Please confirm the lines first.")
+        def calculate():
+            with r.lock:
+                if not r.case.confirmed:
+                    raise ApiError(409, "Please confirm the lines first.")
+                return preview_correction(r.case, body.line_id, body.patient_owed)
+        try:
+            return await asyncio.to_thread(calculate)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/cases/{cid}/report")
+    async def report(cid: str, format: Literal["pdf", "json"] = "pdf"):
+        from explain.report import evidence_report, report_pdf
+        r = rec(cid)
+        if not r.case.confirmed:
+            raise HTTPException(409, "Please confirm the lines first.")
+        def generate():
+            with r.lock:
+                if not r.case.confirmed:
+                    raise ApiError(409, "Please confirm the lines first.")
+                data = evidence_report(r)
+                return data if format == "json" else report_pdf(data, r)
+        result = await asyncio.to_thread(generate)
+        if format == "json":
+            return JSONResponse(result, headers={"Cache-Control": "no-store"})
+        return Response(result, media_type="application/pdf", headers={
+            "Content-Disposition": 'attachment; filename="medbill-evidence-report.pdf"', "Cache-Control": "no-store"})
+
     @app.post("/cases/{cid}/ask")
     async def ask(cid: str, body: AskBody):
         r = rec(cid)

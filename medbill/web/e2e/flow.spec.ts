@@ -55,7 +55,7 @@ test('overcharge sample: total, three findings, evidence highlight, ask, letter'
   await expect(page.getByTestId('headline')).toContainText('You may be overcharged $412.00')
   await expect(page.locator('article')).toHaveCount(3)
   await expect(page.getByText('Definite').first()).toBeVisible()
-  await expect(page.getByText('Likely')).toBeVisible()
+  await expect(page.locator('article').getByText('Likely')).toBeVisible()
 
   // Evidence: highlights the bill line, and the EOB line on the other tab.
   await page.getByTestId('evidence-eob_mismatch').click()

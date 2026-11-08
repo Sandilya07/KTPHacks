@@ -5,6 +5,7 @@ import DocViewer from '../components/DocViewer'
 import { fmt, money, type Strings } from '../strings'
 import type { AuditResult, CaseView, Finding, Highlight } from '../types'
 import Icon from '../components/Icon'
+import { CorrectionPreview, EvidenceDownload, ReconciliationPanel } from '../components/ReviewTools'
 
 const TIER_STYLE = {
   definite: { border: 'tier-definite', badge: 'bg-red-800 text-white', icon: '■' },
@@ -52,6 +53,7 @@ export default function Results({ s, lang, kase, audit, auditKey, setAudit, high
   const [busy, setBusy] = useState('')
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
+  const [filter, setFilter] = useState<'all' | Finding['tier']>('all')
 
   const key = `${kase.case_id}:${lang}`
   useEffect(() => {
@@ -81,15 +83,32 @@ export default function Results({ s, lang, kase, audit, auditKey, setAudit, high
             <p className="result-summary-label"><Icon name={audit.no_errors ? 'shield' : 'search'} />{s.resultsTitle}</p>
             <h2>{headlineParts[0]}{amount && <strong className="result-amount" dir="ltr">{amount}</strong>}{headlineParts[1]}</h2>
             {audit.no_errors && <p className="mt-3 text-sm leading-relaxed">{s.noErrorsBody}</p>}
+            <div className="summary-links">
+              <a href="#correction-preview" onClick={() => { const preview = document.getElementById('correction-preview'); if (preview instanceof HTMLDetailsElement) preview.open = true }}>{s.previewTitle}<Icon name="arrow" /></a>
+              <a href="#evidence-report">{s.reportTitle}<Icon name="document" /></a>
+            </div>
           </div>
+          {kase.sample && <p className="sample-case-label"><Icon name="document" />{s.syntheticCase}</p>}
           <div className="result-metrics">
             <div className="result-metric"><Icon name="document" /><span><strong>{s.billTab}</strong><small>{fmt(s.lineCount, { n: kase.bill.lines.length })}</small></span></div>
             <div className="result-metric"><Icon name="shield" /><span><strong>{s.eobTab}</strong><small>{fmt(s.lineCount, { n: kase.eob.lines.length })}</small></span></div>
             <div className="result-metric"><Icon name="check" /><span><strong>{fmt(s.checkCount, { n: audit.checked.length })}</strong><small>{s.workspace}</small></span></div>
           </div>
+          {audit.reconciliation && <ReconciliationPanel s={s} data={audit.reconciliation} onEvidence={(ids) => setHighlight({ ids, nonce: highlight.nonce + 1 })} />}
+          {audit.reconciliation && <CorrectionPreview s={s} kase={kase} data={audit.reconciliation} />}
+          {sampleParts && <p className="prototype-note"><Icon name="shield" />{s.sampleRules}</p>}
+          {audit.findings.length > 0 && <div className="finding-filters" role="group" aria-label={s.filterFindings}>
+            <button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>{s.allFindings} ({audit.findings.length})</button>
+            {(['definite', 'likely', 'ask'] as const).map((tier) => {
+              const findings = audit.findings.filter((finding) => finding.tier === tier)
+              return findings.length > 0 && <button key={tier} type="button" aria-pressed={filter === tier} onClick={() => setFilter(tier)}>
+                {s.tiers[tier]} ({findings.length}) · {money(findings.reduce((sum, finding) => sum + finding.impact, 0))}
+              </button>
+            })}
+          </div>}
           <div className="results-grid">
             <div className="space-y-5">
-              {audit.findings.map((f) => (
+              {audit.findings.filter((finding) => filter === 'all' || finding.tier === filter).map((f) => (
                 <FindingCard key={f.id} s={s} f={f} active={highlight.ids.join() === f.line_ids.join()}
                   onEvidence={() => setHighlight({ ids: f.line_ids, nonce: highlight.nonce + 1 })} />
               ))}
@@ -101,6 +120,7 @@ export default function Results({ s, lang, kase, audit, auditKey, setAudit, high
             </div>
             <div className="results-evidence"><DocViewer s={s} kase={kase} highlight={highlight} /></div>
           </div>
+          <EvidenceDownload s={s} caseId={kase.case_id} />
           <div className="flex flex-wrap gap-3">
             <button type="button" className="btn-primary text-xl" onClick={onAsk}>{s.askNext}</button>
             <button type="button" className="btn-secondary text-xl" onClick={onLetter}>{s.writeLetter}</button>
