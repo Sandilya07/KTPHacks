@@ -10,7 +10,15 @@ function compile(gl: WebGLRenderingContext, type: number, source: string) {
 }
 
 /** Full-bleed animated "Mesh drift" shader (plain WebGL1, one fullscreen triangle). Sits behind page content. */
-export default function ShaderBackground({ className = '' }: { className?: string }) {
+interface Props {
+  className?: string
+  /** Render-resolution multiplier (1 = full). The field is soft, so a permanent backdrop can run at ~0.4. */
+  resolution?: number
+  /** Frame-rate cap. */
+  fps?: number
+}
+
+export default function ShaderBackground({ className = '', resolution = 1, fps = 60 }: Props) {
   const ref = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -58,7 +66,7 @@ export default function ShaderBackground({ className = '' }: { className?: strin
     let height = 0
 
     function resize() {
-      const ratio = Math.min(window.devicePixelRatio || 1, 2)
+      const ratio = Math.min(window.devicePixelRatio || 1, 2) * resolution
       const w = Math.max(1, Math.round(canvas!.clientWidth * ratio))
       const h = Math.max(1, Math.round(canvas!.clientHeight * ratio))
       if (w !== width || h !== height) { width = canvas!.width = w; height = canvas!.height = h; gl!.viewport(0, 0, w, h) }
@@ -69,7 +77,14 @@ export default function ShaderBackground({ className = '' }: { className?: strin
       gl!.uniform4f(scene, width, height, seconds * TIME_SCALE, COLORS.length)
       gl!.drawArrays(gl!.TRIANGLES, 0, 3)
     }
-    function loop(now: number) { draw(now); frame = requestAnimationFrame(loop) }
+    const minGap = 1000 / fps - 2
+    let lastDraw = 0
+    function loop(now: number) {
+      frame = requestAnimationFrame(loop)
+      if (now - lastDraw < minGap) return
+      lastDraw = now
+      draw(now)
+    }
     function start() { if (!frame && !reduceMotion) frame = requestAnimationFrame(loop) }
     function stop() { cancelAnimationFrame(frame); frame = 0 }
     function visibility() { if (document.hidden) stop(); else start() }
@@ -85,7 +100,7 @@ export default function ShaderBackground({ className = '' }: { className?: strin
       window.removeEventListener('resize', redraw)
       // No loseContext() here: StrictMode re-runs this effect on the same canvas and would get a dead context.
     }
-  }, [])
+  }, [resolution, fps])
 
   return <canvas ref={ref} aria-hidden className={`absolute inset-0 h-full w-full ${className}`} />
 }

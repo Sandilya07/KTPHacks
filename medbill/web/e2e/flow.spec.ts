@@ -4,13 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 const SAMPLES = fileURLToPath(new URL('../../data/samples', import.meta.url))
 
-async function start(page: Page, sample: string, language = 'English') {
+async function start(page: Page, sample: string) {
   await page.goto('/?intro=0')
-  if (language !== 'English') {
-    await page.locator('#language-text').fill(language === 'Español' ? 'Quiero entender mi factura' : 'Би нэхэмжлэхээ ойлгохыг хүсэж байна')
-    await page.getByRole('button', { name: 'Send', exact: true }).click()
-    await expect(page.locator('html')).toHaveAttribute('lang', language === 'Español' ? 'es' : 'mn')
-  }
   await page.getByRole('button', { name: /^(Get started|Comenzar|Эхлэх)$/ }).click()
   await page.getByTestId(`sample-${sample}`).click()
   await page.getByTestId('looks-right').waitFor()
@@ -18,35 +13,6 @@ async function start(page: Page, sample: string, language = 'English') {
 const toResults = async (page: Page) => {
   await page.getByTestId('looks-right').click()
   await page.getByTestId('headline').waitFor()
-}
-
-for (const locale of [
-  { code: 'fr', direction: 'ltr', text: 'Je veux comprendre ma facture', title: 'Comprendre votre facture' },
-  { code: 'ps', direction: 'rtl', text: 'زه غواړم خپل بل وپېژنم', title: 'خپل بل وپېژنئ' },
-  { code: 'ja', direction: 'ltr', text: '請求書について質問したいです', title: '医療費の請求書を理解する' },
-  { code: 'es-MX', direction: 'ltr', text: 'Quiero entender mi factura', title: '' },
-]) {
-  test(`automatic locale response supports ${locale.code}`, async ({ page }) => {
-    await page.route('**/api/language', async (route) => {
-      await route.fulfill({ json: { language: locale.code, strings: locale.title ? { welcomeTitle: locale.title } : {} } })
-    })
-    await page.goto('/?intro=0')
-    await page.locator('#language-text').fill(locale.text)
-    await page.getByRole('button', { name: 'Send', exact: true }).click()
-    await expect(page.locator('html')).toHaveAttribute('lang', locale.code)
-    await expect(page.locator('html')).toHaveAttribute('dir', locale.direction)
-    if (locale.title) await expect(page.getByRole('heading', { level: 1 })).toHaveText(locale.title)
-    else await expect(page.getByRole('button', { name: 'Comenzar', exact: true })).toBeVisible()
-    if (locale.code === 'ps') {
-      await page.getByRole('button', { name: 'Get started', exact: true }).click()
-      await page.getByTestId('sample-overcharge').click()
-      await page.getByTestId('looks-right').waitFor()
-      await toResults(page)
-      await expect(page.getByTestId('headline')).toContainText('$412.00')
-      await page.getByRole('button', { name: 'Write the letter', exact: true }).click()
-      await expect(page.locator('pre[lang="en"]').first()).toHaveAttribute('dir', 'ltr')
-    }
-  })
 }
 
 test('overcharge sample: total, three findings, evidence highlight, ask, letter', async ({ page }) => {
@@ -145,17 +111,25 @@ test('photo sample flags a low-confidence line; editing a value changes the audi
   await expect(page.getByTestId('headline')).toContainText('$205.00')
 })
 
-test('Spanish interface, results and question', async ({ page }) => {
-  await start(page, 'overcharge', 'Español')
-  await expect(page.getByRole('heading', { name: 'Revise lo que leímos' })).toBeVisible()
+// Language is switched from the Ask screen: the typed question is detected and the whole interface follows it.
+async function askToSwitch(page: Page, question: string, htmlLang: string) {
   await toResults(page)
-  await expect(page.getByTestId('headline')).toContainText('Es posible que le hayan cobrado de más: $412.00')
-  await page.getByRole('button', { name: 'Hacer una pregunta' }).click()
-  await page.getByRole('button', { name: '¿Cuánto debo realmente?' }).click()
+  await page.locator('.workflow-step').nth(4).click()
+  await page.locator('#q').fill(question)
+  await page.locator('.chat-composer button[type=submit]').click()
+  await expect(page.locator('html')).toHaveAttribute('lang', htmlLang)
+  await expect(page.getByTestId('msg-assistant').first()).toBeVisible()
+}
+
+test('Spanish interface, results and question', async ({ page }) => {
+  await start(page, 'overcharge')
+  await askToSwitch(page, '¿Cuánto debo realmente?', 'es')
   await expect(page.getByTestId('msg-assistant').first()).toContainText('$412.00')
   const original = page.getByTestId('msg-assistant').first().getByText('Original en inglés', { exact: true })
   await original.click()
   await expect(page.getByTestId('msg-assistant').first().locator('p[lang="en"]')).toContainText('$412.00')
+  await page.locator('.workflow-step').nth(3).click()
+  await expect(page.getByTestId('headline')).toContainText('Es posible que le hayan cobrado de más: $412.00')
 })
 
 test('uploads: a PDF is read, a photo without a model gives a plain message', async ({ page }) => {
@@ -269,19 +243,17 @@ test('accessibility: axe reports no critical violations on any screen', async ({
 })
 
 test('Mongolian demo path: results, grounded answer and side-by-side letter, all verified offline', async ({ page }) => {
-  await start(page, 'overcharge', 'Монгол')
-  await expect(page.getByRole('heading', { name: 'Бидний уншсныг шалгана уу' })).toBeVisible()
-  await toResults(page)
+  await start(page, 'overcharge')
+  await askToSwitch(page, 'Би үнэндээ хэдийг төлөх ёстой вэ?', 'mn')
+  const answer = page.getByTestId('msg-assistant').first()
+  await expect(answer).toContainText('$412.00')
+  await expect(answer).toContainText('нэхэмжлэх')
+  await page.locator('.workflow-step').nth(3).click()
   await expect(page.getByTestId('headline')).toContainText('$412.00')
   await expect(page.getByText('Анхаарах')).toHaveCount(0)
   await expect(page.locator('article').first()).toContainText('кодыг')
   await expect(page.getByRole('note')).toHaveCount(1) // only the page banner: no "could not be checked" notices
-  await page.getByRole('button', { name: 'Асуулт асуух' }).click()
-  await page.getByRole('button', { name: 'Би үнэндээ хэдийг төлөх ёстой вэ?' }).click()
-  const answer = page.getByTestId('msg-assistant').first()
-  await expect(answer).toContainText('$412.00')
-  await expect(answer).toContainText('нэхэмжлэх')
-  await page.getByRole('button', { name: 'Захидал бичих' }).click()
+  await page.locator('.workflow-step').nth(5).click()
   const sbs = page.getByTestId('letter-side-by-side')
   await expect(sbs).toContainText('Маргаантай нийт дүн: $412.00.')
   await expect(sbs).toContainText('Total amount in question: $412.00.')

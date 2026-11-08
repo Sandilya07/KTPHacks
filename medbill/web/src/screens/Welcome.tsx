@@ -1,27 +1,12 @@
-import { useState } from 'react'
-import type { Config } from '../types'
-import { type Strings, interfaceText } from '../strings'
-import { detectLanguage } from '../api'
+import type { Strings } from '../strings'
 import { Screen } from '../components/Chrome'
 import Icon, { MedicalArt, type IconName } from '../components/Icon'
+import { LiquidAccordion } from '@/components/ui/liquid-glass-accordion'
 
-interface Props { s: Strings; config: Config; lang: string; setLang: (l: string, values?: Record<string, string>) => void; onStart: () => void }
+interface Props { s: Strings; onStart: () => void }
 const featureIcons: IconName[] = ['document', 'globe', 'letter']
 
-export default function Welcome({ s, config, lang, setLang, onStart }: Props) {
-  const [text, setText] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [notice, setNotice] = useState('')
-  async function detect() {
-    if (text.trim().length < 2 || busy) return
-    setBusy(true); setNotice('')
-    try {
-      const result = await detectLanguage(text.trim(), interfaceText())
-      setLang(result.language, result.strings)
-      setNotice(result.notice || '')
-    } catch (e) { setNotice(e instanceof Error ? e.message : s.tryAgain) }
-    finally { setBusy(false) }
-  }
+export default function Welcome({ s, onStart }: Props) {
   return <Screen title={s.welcomeTitle} className="welcome-screen" hero={
     <div className="welcome-hero">
       <div className="hero-text">
@@ -29,7 +14,7 @@ export default function Welcome({ s, config, lang, setLang, onStart }: Props) {
         <h1 tabIndex={-1}>{s.welcomeTitle}<span className="heading-dot" aria-hidden /></h1>
         <p className="hero-copy">{s.welcomeBody}</p>
         <div className="hero-actions">
-          <button type="button" className="btn-primary" disabled={busy} onClick={onStart}>{s.start}<Icon name="arrow" className="directional-icon" /></button>
+          <button type="button" className="btn-primary" onClick={onStart}>{s.start}<Icon name="arrow" className="directional-icon" /></button>
           <a className="text-link" href="#language-support">{s.languageLink}<Icon name="globe" /></a>
         </div>
       </div>
@@ -47,14 +32,10 @@ export default function Welcome({ s, config, lang, setLang, onStart }: Props) {
         <h2>{s.languageTitle}</h2><p>{s.languageHelp}</p>
         <div className="language-greetings" aria-hidden><span>Hello</span><i /> <span>Hola</span><i /><span lang="hi">नमस्ते</span><i /><span lang="ar">مرحبا</span></div>
       </div>
-      <form className="language-form" onSubmit={(e) => { e.preventDefault(); void detect() }}>
-        <label htmlFor="language-text">{s.askPlaceholder}</label>
-        <div className="language-input-wrap"><textarea id="language-text" dir="auto" className="field" maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void detect() } }} placeholder="Hola, quiero entender mi factura..." /></div>
-        <div className="language-form-bottom"><span className="language-status" role="status">{notice || (lang !== 'en' ? lang.toUpperCase() : s.welcomePoints[1])}</span>
-          <button className="btn-secondary" disabled={busy || text.trim().length < 2}>{busy ? s.loading : s.send}<Icon name={busy ? 'pulse' : 'arrow'} className={busy ? 'pulse-icon' : 'directional-icon'} /></button>
-        </div>
-        {config.demo_mode && <p className="demo-label">Offline demo: English / Español / Монгол</p>}
-      </form>
     </div>
+    <section className="faq-band" aria-labelledby="faq-title">
+      <h2 id="faq-title">{s.faqTitle}</h2>
+      <LiquidAccordion tone="dark" defaultOpen={0} headingLevel={3} items={s.faqItems} style={{ maxWidth: 680 }} />
+    </section>
   </Screen>
 }

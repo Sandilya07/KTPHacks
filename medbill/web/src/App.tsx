@@ -4,6 +4,7 @@ import { Banner, ErrorBox, Screen, Spinner, Stepper } from './components/Chrome'
 import { AnimatePresence } from 'framer-motion'
 import Icon from './components/Icon'
 import Intro from './components/Intro'
+import ShaderBackground from './components/ShaderBackground'
 import Ask, { type Msg } from './screens/Ask'
 import Letter from './screens/Letter'
 import Results from './screens/Results'
@@ -67,6 +68,8 @@ export default function App() {
   return (
     <>
       <AnimatePresence>{intro && <Intro key="intro" onDone={() => setIntro(false)} />}</AnimatePresence>
+      {/* Same "Mesh drift" shader as the intro, rendered small and capped at 30fps as a calm backdrop for the whole app. */}
+      {!intro && <div className="app-backdrop" aria-hidden><ShaderBackground resolution={0.4} fps={30} /></div>}
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3">{s.skip}</a>
       <Banner s={s} />
       <header className="app-header">
@@ -86,7 +89,7 @@ export default function App() {
         <div className="page-transition" key={step}>
         {configError && <Screen title={s.errorTitle}><ErrorBox s={s} message={configError} onRetry={() => location.reload()} /></Screen>}
         {!config && !configError && <Screen title={s.appName}><Spinner message={s.loading} /></Screen>}
-        {config && step === 0 && <Welcome s={s} config={config} lang={lang} setLang={languageChanged} onStart={() => setStep(1)} />}
+        {config && step === 0 && <Welcome s={s} onStart={() => setStep(1)} />}
         {config && step === 1 && <Upload s={s} config={config} onCase={(c) => { setCase(c); setStep(2) }} onBack={() => setStep(0)} onManual={() => createManual().then((c) => { setCase(c); setStep(2) })} />}
         {config && step === 2 && kase && <Review key={kase.case_id} s={s} kase={kase} onConfirmed={(c) => { setCase(c); setAudit(null); setAuditKey(''); setMsgs([]); setHighlight({ ids: [], nonce: 0 }); setStep(3) }} onBack={() => setStep(1)} />}
         {config && step === 3 && kase && <Results s={s} lang={lang} kase={kase} audit={audit} auditKey={auditKey} setAudit={(a, k) => { setAudit(a); setAuditKey(k) }} highlight={highlight} setHighlight={setHighlight} onAsk={() => setStep(4)} onLetter={() => setStep(5)} onBack={() => setStep(2)} />}

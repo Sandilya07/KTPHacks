@@ -96,6 +96,13 @@ const en = {
   manualTitle: 'Enter the lines by hand',
   startManual: 'Enter lines by hand',
   suggestedList: ['What does this charge mean?', 'Why was I charged twice?', 'How much do I actually owe?', 'What should I say when I call billing?', 'What is an EOB?', 'What happens next?'],
+  faqTitle: 'Common questions',
+  faqItems: [
+    { question: 'Do you keep my documents?', answer: 'No. Your files stay in memory only while you use the app, and are deleted when you finish or after two hours. Nothing is written to disk.' },
+    { question: 'Does the AI decide what is an error?', answer: 'No. A fixed set of billing rules finds the errors and shows the exact lines as evidence. AI only reads text, explains the findings and translates.' },
+    { question: 'Which languages can I use?', answer: 'Type in the language you are most comfortable with. We detect it, translate the screens and answer your questions in it. The letter you send always stays in English.' },
+    { question: 'Is this legal or medical advice?', answer: 'No. It is information to help you ask better questions. Nothing here calls a charge fraud or illegal, so confirm with your billing office or insurer.' },
+  ],
   progress: { reading: 'Reading your bill', checking_lines: 'Checking the lines we read', rules: 'Checking billing rules', explaining: 'Writing explanations' },
 }
 export type Strings = typeof en
@@ -196,6 +203,13 @@ const es: Strings = {
   manualTitle: 'Ingrese las líneas a mano',
   startManual: 'Ingresar líneas a mano',
   suggestedList: ['¿Qué significa este cargo?', '¿Por qué me cobraron dos veces?', '¿Cuánto debo realmente?', '¿Qué debo decir cuando llame a facturación?', '¿Qué es un EOB?', '¿Qué pasa después?'],
+  faqTitle: 'Preguntas frecuentes',
+  faqItems: [
+    { question: '¿Guardan mis documentos?', answer: 'No. Sus archivos permanecen solo en la memoria mientras usa la aplicación y se eliminan cuando termina o a las dos horas. No se escribe nada en el disco.' },
+    { question: '¿La IA decide qué es un error?', answer: 'No. Un conjunto fijo de reglas de facturación encuentra los errores y muestra las líneas exactas como prueba. La IA solo lee texto, explica los hallazgos y traduce.' },
+    { question: '¿Qué idiomas puedo usar?', answer: 'Escriba en el idioma con el que se sienta más cómodo. Lo detectamos, traducimos las pantallas y respondemos sus preguntas en ese idioma. La carta que envíe siempre queda en inglés.' },
+    { question: '¿Es asesoría legal o médica?', answer: 'No. Es información para ayudarle a hacer mejores preguntas. Nada aquí califica un cobro como fraude o ilegal, así que confírmelo con la oficina de facturación o su aseguradora.' },
+  ],
   progress: { reading: 'Leyendo su factura', checking_lines: 'Revisando las líneas que leímos', rules: 'Revisando las reglas de facturación', explaining: 'Escribiendo explicaciones' },
 }
 
@@ -295,6 +309,13 @@ const mn: Strings = {
   manualTitle: 'Мөрүүдийг гараар оруулах',
   startManual: 'Мөрийг гараар оруулах',
   suggestedList: ['Энэ төлбөр юу гэсэн үг вэ?', 'Яагаад надаас хоёр удаа авсан бэ?', 'Би үнэндээ хэдийг төлөх ёстой вэ?', 'Нэхэмжлэхийн алба руу залгахдаа юу гэж хэлэх вэ?', 'EOB гэж юу вэ?', 'Дараа нь юу болох вэ?'],
+  faqTitle: 'Түгээмэл асуултууд',
+  faqItems: [
+    { question: 'Та нар миний баримтыг хадгалдаг уу?', answer: 'Үгүй. Таны файлууд апп ашиглаж байх хугацаанд л санах ойд байх бөгөөд дуусгасны дараа эсвэл хоёр цагийн дараа устгагдана. Диск рүү юу ч бичигддэггүй.' },
+    { question: 'Алдааг хиймэл оюун шийддэг үү?', answer: 'Үгүй. Тогтсон нэхэмжлэхийн дүрмүүд алдааг олж, яг тухайн мөрүүдийг нотолгоо болгон харуулдаг. Хиймэл оюун зөвхөн текст уншиж, дүгнэлтийг тайлбарлаж, орчуулдаг.' },
+    { question: 'Ямар хэлээр ашиглаж болох вэ?', answer: 'Өөрт тохирох хэлээрээ бичнэ үү. Бид хэлийг нь таньж, дэлгэцийг орчуулан, тэр хэлээр хариулна. Таны илгээх захидал үргэлж англи хэлээр байна.' },
+    { question: 'Энэ хууль эсвэл эмнэлгийн зөвлөгөө мөн үү?', answer: 'Үгүй. Энэ нь илүү сайн асуулт асуухад тань туслах мэдээлэл юм. Энд аль ч төлбөрийг залилан эсвэл хууль бус гэж нэрлээгүй, тиймээс нэхэмжлэхийн алба эсвэл даатгагчаасаа лавлаарай.' },
+  ],
   progress: { reading: 'Нэхэмжлэхийг тань уншиж байна', checking_lines: 'Уншсан мөрүүдийг шалгаж байна', rules: 'Нэхэмжлэхийн дүрмийг шалгаж байна', explaining: 'Тайлбар бичиж байна' },
 }
 

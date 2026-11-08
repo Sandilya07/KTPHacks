@@ -9,7 +9,7 @@ export default defineConfig({
   timeout: 60_000,
   retries: 0,
   reporter: [['list']],
-  use: { baseURL: 'http://127.0.0.1:5173', trace: 'retain-on-failure' },
+  use: { baseURL: process.env.BASE_URL ?? 'http://127.0.0.1:5173', trace: 'retain-on-failure' },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'phone-375', use: { ...devices['Desktop Chrome'], viewport: { width: 375, height: 800 } } },

@@ -3,8 +3,7 @@
 @layer base {
   :root { --ink: #183c49; --muted: #536b73; --teal: #137c78; --teal-dark: #09645f; --mint: #e5f4ef; --line: #dde8e6; --paper: #ffffff; }
   html { font-size: 16px; scroll-behavior: smooth; scroll-padding-top: 120px; }
-  body { margin: 0; min-width: 320px; background: #f5f8f7; color: var(--ink); font-family: "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-  body::before { content: ''; position: fixed; z-index: -1; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 96% 10%, #d7eee54d, transparent 45%); }
+  body { margin: 0; min-width: 320px; background: #03120e; color: var(--ink); font-family: "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
   button, input, select, textarea { font: inherit; }
   button, a, input, select, textarea, summary { -webkit-tap-highlight-color: transparent; }
   button:not(:disabled), summary { cursor: pointer; }
@@ -290,3 +289,84 @@ html[data-intro] .privacy-banner,
 html[data-intro] .app-header,
 html[data-intro] .app-shell,
 html[data-intro] a[href="#main"] { display: none !important; }
+
+/* ---- Smoked-glass theme: the shader shows through frosted dark glass; every panel is glass, nothing is white ---- */
+:root { --ink: #eaf6ef; --muted: #b9d0c6; --line: rgba(255,255,255,.14); --paper: rgba(255,255,255,.06); --glass: rgba(5,22,17,.78); --glass-edge: rgba(255,255,255,.16); --focus: #6fe0c5; }
+:focus-visible { outline-color: var(--focus); }
+::selection { background: #2b8c73; color: #fff; }
+.app-backdrop { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #03120e; }
+.app-backdrop::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(3,18,14,.3), rgba(3,18,14,.08) 40%, rgba(3,18,14,.36)); }
+.privacy-banner { background: rgba(3,18,14,.55); border-bottom: 1px solid rgba(255,255,255,.1); color: #d3eadf; backdrop-filter: blur(14px); }
+.app-header, .workflow-nav, #main { background: var(--glass); border: 1px solid var(--glass-edge); backdrop-filter: blur(28px) saturate(1.5); -webkit-backdrop-filter: blur(28px) saturate(1.5); box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 40px 90px -40px rgba(0,0,0,.7); }
+.app-header { border-width: 0 0 1px; box-shadow: 0 14px 40px -26px rgba(0,0,0,.7), inset 0 -1px 0 rgba(255,255,255,.08); }
+.workflow-nav { padding: 20px 14px 16px; border-radius: 26px; }
+#main { padding: 38px 40px 44px; border-radius: 30px; align-self: start; }
+@media (max-width: 1100px) { #main { padding: 30px 26px 36px; } .workflow-nav { padding: 12px 10px; border-radius: 22px; } }
+@media (max-width: 700px) { #main { padding: 22px 16px 28px; border-radius: 22px; } .app-shell { padding-inline: 12px; } }
+
+/* text */
+h1, h2, h3, .brand { color: var(--ink); }
+.brand small, .nav-eyebrow, .workflow-caption, .screen-content > p, .hero-copy, .feature-card p, .language-intro p, .language-form > label, .language-status, .demo-label,
+.result-metric small, .finding-card dl, .finding-card dt, .sample-links, .upload-zone > p, .letter-paper-note, .step-number { color: var(--muted); }
+.text-link, .sample-card > button, .language-greetings, .language-symbol span { color: #cfe6dc; }
+.text-link:hover, .sample-links a:hover, details > summary:hover { color: #fff; }
+.eyebrow, .hero-eyebrow, .language-symbol { color: #8fe3c9; }
+.hero-eyebrow { background: rgba(143,227,201,.1); border-color: rgba(143,227,201,.28); }
+.heading-dot { background: #6fe0c5; } .heading-rule { background: #6fe0c5; }
+.text-slate-700, .text-slate-600 { color: #cfe3d9; }
+.text-amber-900 { color: #fde68a; } .text-green-900 { color: #a8f0c4; } .text-red-900, .text-red-950 { color: #ffd9d4; }
+
+/* glass surfaces inside the panel */
+.card, .feature-card, .result-metric, .sample-card, .upload-zone, .chat-log, .chat-composer, .suggestion-list .btn-secondary, [data-testid=doc-viewer], .bg-white, .bg-slate-100 {
+  background: var(--paper); border-color: var(--glass-edge); box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
+.feature-card:hover, .sample-card:hover { background: rgba(255,255,255,.1); border-color: rgba(143,227,201,.45); box-shadow: 0 14px 30px -18px rgba(0,0,0,.6); }
+.upload-zone { border-color: rgba(143,227,201,.4); } .upload-zone.is-over { background: rgba(143,227,201,.14); border-color: #8fe3c9; }
+.chat-message[data-testid=msg-user] { background: rgba(43,140,115,.28); }
+.chat-message > p:first-child { color: #a9cdbd; }
+[data-testid=doc-viewer] #doc-panel { background: rgba(255,255,255,.08); border-color: var(--glass-edge); }
+.feature-icon, .upload-zone-icon, .sample-icon, .step-icon, .sidebar-care-icon, .loading-orbit { background: rgba(255,255,255,.1); color: #9fe6cf; }
+.feature-card:nth-child(2) .feature-icon { color: #9cc8ee; } .feature-card:nth-child(3) .feature-icon { color: #f0cf94; }
+.result-metric > .icon { color: #8fe3c9; }
+.sidebar-care { background: rgba(255,255,255,.06); border-color: var(--glass-edge); } .sidebar-care p { color: var(--muted); } .sidebar-care > svg { stroke: rgba(143,227,201,.5); }
+.result-summary.is-clean { background: rgba(80,190,130,.16); border-color: rgba(80,190,130,.4); color: #c8f3da; }
+.result-summary.is-question { background: rgba(110,160,210,.16); border-color: rgba(110,160,210,.4); color: #d3e6f6; }
+.letter-paper { background: var(--paper); border-color: var(--glass-edge); border-top-color: #6fe0c5; } .letter-paper pre { color: #dcebe3; }
+.art-orbit { background: rgba(143,227,201,.1); border-color: rgba(143,227,201,.22); } .art-orbit-inner { background: rgba(143,227,201,.08); border-color: rgba(143,227,201,.3); }
+
+/* controls */
+.btn-secondary { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.26); color: var(--ink); }
+.btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,.18); border-color: rgba(143,227,201,.6); box-shadow: none; }
+.btn-primary:disabled { background: #3d5c56; color: #d9ece5; }
+.field { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.28); color: var(--ink); }
+.field:hover { border-color: rgba(143,227,201,.55); } .field:focus { border-color: #8fe3c9; box-shadow: 0 0 0 3px rgba(143,227,201,.2); }
+.field::placeholder, .language-input-wrap textarea::placeholder { color: #9cb8ac; }
+.language-input-wrap textarea { background: rgba(255,255,255,.07); }
+.chat-composer .field { background: transparent; }
+select.field option { background: #08221b; color: var(--ink); }
+[role=tablist] { background: rgba(255,255,255,.08); }
+[role=tablist] [role=tab] { color: #c4dbd0; }
+[role=tablist] [role=tab][aria-selected=true] { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.3); color: #fff; box-shadow: none; }
+.border-slate-300, .border-slate-400 { border-color: rgba(255,255,255,.26); } .border-blue-700, .border-blue-800 { border-color: #8cc0ff; } .bg-blue-50 { background: rgba(140,192,255,.2); }
+.bg-amber-50 { background: rgba(251,191,36,.14); color: #fde9b0; } .border-amber-500, .border-amber-600 { border-color: #f5b83d; } .bg-yellow-100 { background: rgba(250,204,21,.2); }
+.bg-red-50 { background: rgba(239,68,68,.16); } .border-red-700 { border-color: #f08a84; } .bg-yellow-300 { color: #1b1b12; }
+
+/* sidebar steps */
+.workflow-step { color: #c3dacf; }
+.workflow-step:hover:not(:disabled):not(.is-current) { background: rgba(255,255,255,.1); color: #fff; }
+.workflow-step.is-current { background: rgba(143,227,201,.16); color: #fff; border-color: rgba(143,227,201,.35); }
+.is-current .step-number { color: #bfeedd; } .is-complete .step-icon { background: rgba(143,227,201,.18); color: #8fe3c9; }
+.workflow-step:disabled { color: #8ba79b; } .workflow-step:disabled .step-icon { background: rgba(255,255,255,.05); color: #7f9a8f; }
+.workflow-progress { background: rgba(255,255,255,.14); } .workflow-progress span { background: #6fe0c5; }
+
+/* header */
+.locale-badge { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.22); color: #dcefe6; }
+.header-reset { color: #cfe3d9; } .header-reset:hover { background: rgba(255,120,110,.18); color: #ffd9d4; }
+
+/* FAQ: the accordion is its own glass, so the band is just a labelled section */
+.faq-band { margin-top: 8px; padding: 30px 0 4px; display: grid; gap: 20px; justify-items: center; text-align: center; border-top: 1px solid var(--glass-edge); }
+.faq-band h2 { margin: 0; color: var(--ink); font-size: clamp(1.3rem, 2.2vw, 1.7rem); }
+.faq-band .nimbus-faq { text-align: start; }
+@media (max-width: 700px) { .faq-band { padding-top: 24px; } }
+.result-summary h2 { color: inherit; }
+[role=table] [role=row]:not([class*="border-"]) { border-color: transparent; }
+.language-panel { grid-template-columns: minmax(0, 1fr); }
