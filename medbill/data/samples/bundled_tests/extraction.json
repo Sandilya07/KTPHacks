@@ -1,0 +1,261 @@
+{
+ "bill": {
+  "provider": "Summit Imaging and Lab",
+  "account_number": "ACCT-54487",
+  "patient_balance": 131.58,
+  "lines": [
+   {
+    "date": "2025-04-05",
+    "code": "83036",
+    "modifiers": [],
+    "description": "Hemoglobin A1c",
+    "units": 1,
+    "billed": 35.0,
+    "patient_owed": 24.07,
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     522,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-04-05",
+    "code": "93000",
+    "modifiers": [],
+    "description": "Electrocardiogram",
+    "units": 1,
+    "billed": 60.0,
+    "patient_owed": 30.0,
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     522,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-04-25",
+    "code": "99214",
+    "modifiers": [],
+    "description": "Office visit, detailed",
+    "units": 1,
+    "billed": 220.0,
+    "patient_owed": 22.51,
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     522,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-04-05",
+    "code": "80053",
+    "modifiers": [],
+    "description": "Metabolic panel",
+    "units": 1,
+    "billed": 95.0,
+    "patient_owed": 20.0,
+    "page": 0,
+    "bbox": [
+     34,
+     200,
+     522,
+     220
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-04-05",
+    "code": "82947",
+    "modifiers": [],
+    "description": "Glucose test",
+    "units": 1,
+    "billed": 110.0,
+    "patient_owed": 35.0,
+    "page": 0,
+    "bbox": [
+     34,
+     220,
+     522,
+     240
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ },
+ "eob": {
+  "payer": "Pioneer Health Partners",
+  "network_status": "in",
+  "total_patient_responsibility": 96.58,
+  "lines": [
+   {
+    "date": "2025-04-05",
+    "code": "83036",
+    "modifiers": [],
+    "allowed": 24.07,
+    "plan_paid": 0.0,
+    "patient_resp": 24.07,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     552,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-04-05",
+    "code": "93000",
+    "modifiers": [],
+    "allowed": 32.22,
+    "plan_paid": 2.22,
+    "patient_resp": 30.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     552,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-04-25",
+    "code": "99214",
+    "modifiers": [],
+    "allowed": 112.57,
+    "plan_paid": 90.06,
+    "patient_resp": 22.51,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     552,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-04-05",
+    "code": "80053",
+    "modifiers": [],
+    "allowed": 55.71,
+    "plan_paid": 35.71,
+    "patient_resp": 20.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     200,
+     552,
+     220
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-04-05",
+    "code": "82947",
+    "modifiers": [],
+    "allowed": 0.0,
+    "plan_paid": 0.0,
+    "patient_resp": 0.0,
+    "status": "denied-bundled",
+    "adjustment_reason": "CARC 97",
+    "page": 0,
+    "bbox": [
+     34,
+     220,
+     552,
+     240
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ }
+}

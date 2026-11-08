@@ -1,0 +1,138 @@
+{
+ "bill": {
+  "provider": "Oak Street Health Center",
+  "account_number": "ACCT-31102",
+  "patient_balance": 78.14,
+  "lines": [
+   {
+    "date": "2026-06-17",
+    "code": "80061",
+    "modifiers": [],
+    "description": "Lipid panel",
+    "units": 1,
+    "billed": 55.0,
+    "patient_owed": 30.0,
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     522,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-06-17",
+    "code": "83036",
+    "modifiers": [],
+    "description": "Hemoglobin A1c",
+    "units": 1,
+    "billed": 35.0,
+    "patient_owed": 18.14,
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     522,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-06-17",
+    "code": "80061",
+    "modifiers": [],
+    "description": "Lipid panel",
+    "units": 1,
+    "billed": 55.0,
+    "patient_owed": 30.0,
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     522,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ },
+ "eob": {
+  "payer": "Evergreen Mutual",
+  "network_status": "in",
+  "total_patient_responsibility": 48.14,
+  "lines": [
+   {
+    "date": "2026-06-17",
+    "code": "80061",
+    "modifiers": [],
+    "allowed": 33.99,
+    "plan_paid": 3.99,
+    "patient_resp": 30.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     552,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-06-17",
+    "code": "83036",
+    "modifiers": [],
+    "allowed": 18.14,
+    "plan_paid": 0.0,
+    "patient_resp": 18.14,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     552,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ }
+}

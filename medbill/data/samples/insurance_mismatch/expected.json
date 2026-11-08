@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "total_impact": 18.87,
+  "rules": [
+    "eob_mismatch"
+  ]
+}

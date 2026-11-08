@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "total_impact": 15.0,
+  "rules": [
+    "excess_units"
+  ]
+}

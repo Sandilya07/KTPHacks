@@ -1,0 +1,212 @@
+{
+ "bill": {
+  "provider": "Lakeside Family Clinic",
+  "account_number": "ACCT-48483",
+  "patient_balance": 79.65,
+  "lines": [
+   {
+    "date": "2025-09-11",
+    "code": "85025",
+    "modifiers": [],
+    "description": "Blood count, complete",
+    "units": 1,
+    "billed": 45.0,
+    "patient_owed": 23.86,
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     522,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-09-11",
+    "code": "71046",
+    "modifiers": [],
+    "description": "Chest x-ray, 2 views",
+    "units": 1,
+    "billed": 140.0,
+    "patient_owed": 15.0,
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     522,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-10-02",
+    "code": "99214",
+    "modifiers": [],
+    "description": "Office visit, detailed",
+    "units": 1,
+    "billed": 220.0,
+    "patient_owed": 20.0,
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     522,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-10-02",
+    "code": "83036",
+    "modifiers": [],
+    "description": "Hemoglobin A1c",
+    "units": 1,
+    "billed": 35.0,
+    "patient_owed": 20.79,
+    "page": 0,
+    "bbox": [
+     34,
+     200,
+     522,
+     220
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ },
+ "eob": {
+  "payer": "Evergreen Mutual",
+  "network_status": "in",
+  "total_patient_responsibility": 79.65,
+  "lines": [
+   {
+    "date": "2025-09-11",
+    "code": "85025",
+    "modifiers": [],
+    "allowed": 23.86,
+    "plan_paid": 0.0,
+    "patient_resp": 23.86,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     552,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-09-11",
+    "code": "71046",
+    "modifiers": [],
+    "allowed": 87.22,
+    "plan_paid": 72.22,
+    "patient_resp": 15.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     552,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-10-02",
+    "code": "99214",
+    "modifiers": [],
+    "allowed": 113.32,
+    "plan_paid": 93.32,
+    "patient_resp": 20.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     552,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-10-02",
+    "code": "83036",
+    "modifiers": [],
+    "allowed": 20.79,
+    "plan_paid": 0.0,
+    "patient_resp": 20.79,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     200,
+     552,
+     220
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "total_impact": 53.09,
+  "rules": [
+    "balance_billing"
+  ]
+}

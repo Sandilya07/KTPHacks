@@ -1,0 +1,212 @@
+{
+ "bill": {
+  "provider": "Riverbend Medical Group",
+  "account_number": "ACCT-46740",
+  "patient_balance": 92.95,
+  "lines": [
+   {
+    "date": "2026-06-12",
+    "code": "83036",
+    "modifiers": [],
+    "description": "Hemoglobin A1c",
+    "units": 1,
+    "billed": 35.0,
+    "patient_owed": 22.83,
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     522,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-06-12",
+    "code": "85025",
+    "modifiers": [],
+    "description": "Blood count, complete",
+    "units": 1,
+    "billed": 45.0,
+    "patient_owed": 6.25,
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     522,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-07-02",
+    "code": "99213",
+    "modifiers": [],
+    "description": "Office visit, established",
+    "units": 1,
+    "billed": 150.0,
+    "patient_owed": 25.0,
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     522,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-07-02",
+    "code": "80061",
+    "modifiers": [],
+    "description": "Lipid panel",
+    "units": 1,
+    "billed": 55.0,
+    "patient_owed": 38.87,
+    "page": 0,
+    "bbox": [
+     34,
+     200,
+     522,
+     220
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ },
+ "eob": {
+  "payer": "Evergreen Mutual",
+  "network_status": "in",
+  "total_patient_responsibility": 74.08,
+  "lines": [
+   {
+    "date": "2026-06-12",
+    "code": "83036",
+    "modifiers": [],
+    "allowed": 22.83,
+    "plan_paid": 0.0,
+    "patient_resp": 22.83,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     552,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-06-12",
+    "code": "85025",
+    "modifiers": [],
+    "allowed": 31.26,
+    "plan_paid": 25.01,
+    "patient_resp": 6.25,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     552,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-07-02",
+    "code": "99213",
+    "modifiers": [],
+    "allowed": 79.81,
+    "plan_paid": 54.81,
+    "patient_resp": 25.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     180,
+     552,
+     200
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2026-07-02",
+    "code": "80061",
+    "modifiers": [],
+    "allowed": 32.45,
+    "plan_paid": 12.45,
+    "patient_resp": 20.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     200,
+     552,
+     220
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ }
+}
