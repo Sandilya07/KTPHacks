@@ -49,7 +49,7 @@ export default function Welcome({ s, config, lang, setLang, onStart }: Props) {
       </div>
       <form className="language-form" onSubmit={(e) => { e.preventDefault(); void detect() }}>
         <label htmlFor="language-text">{s.askPlaceholder}</label>
-        <div className="language-input-wrap"><textarea id="language-text" dir="auto" className="field" maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} placeholder="Hola, quiero entender mi factura..." /></div>
+        <div className="language-input-wrap"><textarea id="language-text" dir="auto" className="field" maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void detect() } }} placeholder="Hola, quiero entender mi factura..." /></div>
         <div className="language-form-bottom"><span className="language-status" role="status">{notice || (lang !== 'en' ? lang.toUpperCase() : s.welcomePoints[1])}</span>
           <button className="btn-secondary" disabled={busy || text.trim().length < 2}>{busy ? s.loading : s.send}<Icon name={busy ? 'pulse' : 'arrow'} className={busy ? 'pulse-icon' : 'directional-icon'} /></button>
         </div>
