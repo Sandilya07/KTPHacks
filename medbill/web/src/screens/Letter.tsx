@@ -49,7 +49,7 @@ export default function Letter({ s, lang, kase, onBack }: Props) {
       {letter && (
         <div className={busy ? 'opacity-60' : ''} aria-busy={busy}>
           {lang === 'en' ? (
-            <section aria-labelledby="en-h" className="card">
+            <section aria-labelledby="en-h" className="card letter-paper">
               <h2 id="en-h" className="text-xl font-bold">{s.english}</h2>
               <pre lang="en" dir="ltr" className="mt-2 whitespace-pre-wrap font-sans text-base" data-testid="letter-english">{letter.english}</pre>
             </section>

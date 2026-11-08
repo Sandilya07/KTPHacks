@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from audit.models import Case
 from explain.explainer import Explanation
 from extraction.render import Page
+from i18n.translate import TranslationMemo
 
 
 @dataclass
@@ -22,6 +23,7 @@ class Record:
     extractor: str = ""
     touched: float = field(default_factory=time.time)
     lock: threading.Lock = field(default_factory=threading.Lock)  # serialises audits of one case
+    translation_memo: TranslationMemo = field(default_factory=TranslationMemo)
 
 
 class CaseNotFound(KeyError):

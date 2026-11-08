@@ -160,7 +160,7 @@ export default function Review({ s, kase, onConfirmed, onBack }: Props) {
             <button type="button" className="btn-secondary" onClick={addLine}>+ {s.addLine}</button>
           </div>
           <div className="2xl:sticky 2xl:top-4 2xl:self-start">
-            <DocViewer s={s} kase={kase} highlight={selected} />
+            <DocViewer s={s} kase={kase} highlight={selected} scrollToHighlight={false} />
           </div>
         </div>
       )}

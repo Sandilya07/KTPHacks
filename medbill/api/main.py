@@ -253,7 +253,7 @@ def create_app(settings: Settings | None = None, llm: LLMClient | None = None, e
         if not r.case.findings and not r.explanations:
             from audit.engine import run_case
             run_case(r.case)
-        qa = QA(service.translator_for(app.state.llm, settings), None if settings.demo_mode else app.state.llm)
+        qa = QA(service.translator_for(app.state.llm, settings, memo=r.translation_memo), None if settings.demo_mode else app.state.llm)
         try:
             res = await asyncio.to_thread(qa.ask, r.case, body.question, body.language,
                                           [turn.model_dump() for turn in body.history])
@@ -283,7 +283,7 @@ def create_app(settings: Settings | None = None, llm: LLMClient | None = None, e
                             headers={"Content-Disposition": 'attachment; filename="billing-review-request.txt"'})
         segs = []
         if lang != "en":
-            tr = service.translator_for(app.state.llm, settings)
+            tr = service.translator_for(app.state.llm, settings, memo=r.translation_memo)
             segs = [s.__dict__ for s in await asyncio.to_thread(translate_letter, lt, tr, lang)]
         return {"english": lt.to_text(), "language": lang, "segments": segs, "total": lt.total,
                 "rows": len(lt.rows), "paragraph_source": lt.paragraph_source,

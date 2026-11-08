@@ -3,6 +3,7 @@ import { askQuestion, detectLanguage } from '../api'
 import { ErrorBox, Screen } from '../components/Chrome'
 import { interfaceText, type Strings } from '../strings'
 import type { AskResult, AuditResult, CaseView, Config, Highlight } from '../types'
+import Icon from '../components/Icon'
 
 export interface Msg { role: 'user' | 'assistant'; text: string; result?: AskResult; lang: string }
 interface Props {
@@ -61,17 +62,17 @@ export default function Ask({ onLanguage, s, config, lang, kase, audit, msgs, se
     <Screen title={s.askTitle}>
       <p className="text-xl">{s.askIntro}</p>
       {error && <ErrorBox s={s} message={error} />}
-      <div className="card space-y-4">
+      <div className="card chat-card space-y-4">
         <p className="text-sm text-slate-600">{s.welcomePoints[1]}</p>
         <div>
           <p className="text-lg font-semibold">{s.suggested}</p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="suggestion-list mt-2 flex flex-wrap gap-2">
             {suggestions.map((q) => <button key={q} type="button" className="btn-secondary min-h-11 text-base" lang={askLang} onClick={() => void send(q)}>{q}</button>)}
           </div>
         </div>
-        <div role="log" aria-live="polite" aria-label={s.askTitle} tabIndex={0} className="max-h-[50vh] min-h-24 space-y-3 overflow-auto rounded-xl bg-slate-50 p-3" data-testid="chat-log">
+        <div role="log" aria-live="polite" aria-label={s.askTitle} tabIndex={0} className="chat-log space-y-3 overflow-auto" data-testid="chat-log">
           {msgs.map((m, i) => (
-            <div key={i} className={m.role === 'user' ? 'ms-8 rounded-xl bg-blue-100 p-3' : 'me-8 rounded-xl border border-slate-300 bg-white p-3'} data-testid={`msg-${m.role}`}>
+            <div key={i} className={`chat-message ${m.role === 'user' ? 'ms-8 p-4' : 'me-8 border bg-white p-4'}`} data-testid={`msg-${m.role}`}>
               <p className="text-sm font-semibold text-slate-700">{m.role === 'user' ? s.you : s.assistant}</p>
               <p className="text-lg" dir="auto" lang={m.lang}>{m.text}</p>
               {m.result?.answer_en && m.result.answer_en !== m.text && (
@@ -97,11 +98,11 @@ export default function Ask({ onLanguage, s, config, lang, kase, audit, msgs, se
           {busy && <p className="text-lg text-slate-700" role="status">{s.thinking}</p>}
           <div ref={end} />
         </div>
-        <form className="flex flex-wrap gap-3" onSubmit={(e) => { e.preventDefault(); void send(text) }}>
+        <form className="chat-composer flex flex-wrap gap-3" onSubmit={(e) => { e.preventDefault(); void send(text) }}>
           <label className="sr-only" htmlFor="q">{s.askPlaceholder}</label>
           <input id="q" className="field min-w-0 flex-1" placeholder={s.askPlaceholder} value={text} onChange={(e) => setText(e.target.value)} dir="auto" maxLength={4000} />
 
-          <button type="submit" className="btn-primary" disabled={busy || !text.trim()}>{s.send}</button>
+          <button type="submit" className="btn-primary" disabled={busy || !text.trim()}>{s.send}<Icon name="arrow" className="directional-icon" /></button>
         </form>
       </div>
       <div className="flex flex-wrap gap-3">

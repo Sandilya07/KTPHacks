@@ -3,6 +3,7 @@ import { createCase } from '../api'
 import { ErrorBox, Screen, Spinner } from '../components/Chrome'
 import { fmt, type Strings } from '../strings'
 import type { CaseView, Config } from '../types'
+import Icon from '../components/Icon'
 
 interface Props {
   s: Strings; config: Config; onCase: (c: CaseView) => void; onBack: () => void
@@ -16,11 +17,12 @@ function DropZone({ label, s, file, setFile, id }: { label: string; s: Strings; 
   const pick = (f?: File | null) => f && setFile(f)
   return (
     <div
-      className={`card border-2 border-dashed text-center ${over ? 'border-blue-700 bg-blue-50' : 'border-slate-400'}`}
+      className={`upload-zone ${over ? 'is-over' : ''}`}
       onDragOver={(e) => { e.preventDefault(); setOver(true) }}
       onDragLeave={() => setOver(false)}
       onDrop={(e) => { e.preventDefault(); setOver(false); pick(e.dataTransfer.files[0]) }}
     >
+      <span className="upload-zone-icon"><Icon name={id === 'bill' ? 'document' : 'shield'} /></span>
       <h2 className="text-xl font-semibold" id={`${id}-label`}>{label}</h2>
       <p className="mt-1 text-lg text-slate-700">{s.drop}</p>
       <div className="mt-3 flex flex-wrap justify-center gap-3">
@@ -76,15 +78,16 @@ export default function Upload({ s, config, onCase, onBack, onManual }: Props) {
             <button type="button" className="btn-primary text-xl" onClick={upload}>{s.readDocs}</button>
             <button type="button" className="btn-secondary" onClick={onBack}>{s.back}</button>
           </div>
-          <div className="card">
+          <div className="card sample-section">
             <p className="text-lg font-semibold">{s.orSample}</p>
-            <div className="mt-3 flex flex-wrap gap-3">
+            <div className="sample-grid">
               {Object.entries(config.samples).map(([key, label]) => (
-                <div key={key} className="rounded-xl border border-slate-200 p-3">
-                  <button type="button" className="btn-secondary" data-testid={`sample-${key}`} onClick={() => sample(key)}>{label}</button>
-                  <div className="mt-2 flex flex-wrap gap-4 text-sm">
-                    <a className="text-teal-800 underline" href={`/api/samples/${key}/bill`} download>{s.bill}</a>
-                    <a className="text-teal-800 underline" href={`/api/samples/${key}/eob`} download>{s.eob}</a>
+                <div key={key} className="sample-card">
+                  <span className="sample-icon"><Icon name={key.includes('photo') ? 'upload' : 'document'} /></span>
+                  <button type="button" data-testid={`sample-${key}`} onClick={() => sample(key)}>{label}</button>
+                  <div className="sample-links">
+                    <a href={`/api/samples/${key}/bill`} download>{s.bill}</a>
+                    <a href={`/api/samples/${key}/eob`} download>{s.eob}</a>
                   </div>
                 </div>
               ))}

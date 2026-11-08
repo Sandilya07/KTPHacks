@@ -192,6 +192,41 @@ test('keyboard: focus moves to each screen heading and the skip link works', asy
   await expect(page.getByRole('heading', { name: 'Add your documents' })).toBeFocused()
 })
 
+test('workflow navigation requires review and preserves question history', async ({ page }) => {
+  await page.goto('/')
+  const nav = page.getByRole('navigation')
+  await expect(nav.getByRole('button', { name: 'Check', exact: true })).toBeDisabled()
+  await expect(nav.getByRole('button', { name: 'Results', exact: true })).toBeDisabled()
+  await nav.getByRole('button', { name: 'Upload', exact: true }).click()
+  await page.getByTestId('sample-overcharge').click()
+  await page.getByTestId('looks-right').waitFor()
+  await expect(nav.getByRole('button', { name: 'Ask', exact: true })).toBeDisabled()
+  await toResults(page)
+  await nav.getByRole('button', { name: 'Ask', exact: true }).click()
+  await page.getByRole('button', { name: 'What is an EOB?', exact: true }).click()
+  await page.getByTestId('msg-assistant').first().waitFor()
+  await nav.getByRole('button', { name: 'Results', exact: true }).click()
+  await expect(page.getByTestId('headline')).toContainText('$412.00')
+  await nav.getByRole('button', { name: 'Ask', exact: true }).click()
+  await expect(page.getByTestId('msg-assistant')).toHaveCount(1)
+  await nav.getByRole('button', { name: 'Check', exact: true }).click()
+  await expect(nav.getByRole('button', { name: 'Results', exact: true })).toBeDisabled()
+  await expect(nav.getByRole('button', { name: 'Letter', exact: true })).toBeDisabled()
+  await toResults(page)
+  await expect(nav.getByRole('button', { name: 'Letter', exact: true })).toBeEnabled()
+})
+
+test('reduced motion leaves content visible without continuous animation', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Understand your medical bill' })).toBeVisible()
+  const animations = await page.locator('.art-paper-front, .feature-card').evaluateAll((elements) =>
+    elements.map((el) => ({ duration: parseFloat(getComputedStyle(el).animationDuration), iterations: getComputedStyle(el).animationIterationCount })))
+  expect(animations.every((a) => a.duration <= 0.001 && a.iterations === '1')).toBeTruthy()
+  await page.getByRole('button', { name: 'Get started', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Add your documents' })).toBeFocused()
+})
+
 test('no horizontal scroll and no overflow at this width', async ({ page }) => {
   await start(page, 'overcharge')
   const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
@@ -202,9 +237,17 @@ test('no horizontal scroll and no overflow at this width', async ({ page }) => {
 
 test('accessibility: axe reports no critical violations on any screen', async ({ page }) => {
   const check = async (label: string) => {
+    // Check the settled screen, after entrance and message transitions finish.
+    await page.locator('.page-transition').evaluate(async (element) => {
+      const entrance = element.getAnimations({ subtree: true }).filter((a) => {
+        const timing = a.effect?.getTiming()
+        return typeof timing?.duration === 'number' && timing.duration <= 600 && timing.iterations !== Infinity
+      })
+      await Promise.all(entrance.map((a) => a.finished.catch(() => {})))
+    })
     const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()
     const bad = r.violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
-    expect(bad.map((v) => `${label}: ${v.id} (${v.impact})`), JSON.stringify(bad.map((v) => v.nodes.map((n) => n.html).slice(0, 2)))).toEqual([])
+    expect(bad.map((v) => `${label}: ${v.id} (${v.impact})`), JSON.stringify(bad.map((v) => v.nodes.map((n) => ({ html: n.html, reason: n.failureSummary }))))).toEqual([])
   }
   await page.goto('/')
   await check('welcome')

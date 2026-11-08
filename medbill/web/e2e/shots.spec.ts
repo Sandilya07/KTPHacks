@@ -4,7 +4,10 @@ import { test } from '@playwright/test'
 test('screens', async ({ page }, info) => {
   const dir = process.env.SHOTS
   test.skip(!dir, 'set SHOTS to a folder to capture screenshots')
-  const shot = (n: string) => page.screenshot({ path: `${dir}/${info.project.name}-${n}.png`, fullPage: true })
+  const shot = async (n: string) => {
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
+    await page.screenshot({ path: `${dir}/${info.project.name}-${n}.png`, fullPage: true, animations: 'disabled' })
+  }
   await page.goto('/')
   await shot('1-welcome')
   await page.getByRole('button', { name: 'Get started' }).click()

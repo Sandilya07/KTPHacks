@@ -1,6 +1,15 @@
 // Interface text. English is the source. Spanish and Mongolian are DRAFTS written by Claude and need
 // review by a native speaker. Numbers, codes and dates are never part of these strings.
 const en = {
+  workspace: 'Your bill review',
+  heroEyebrow: 'Clarity for your care',
+  languageTitle: 'Care speaks your language.',
+  languageHelp: 'Type in the language you feel most comfortable with. We’ll detect it and translate your experience.',
+  languageLink: 'Use your language',
+  privacyShort: 'Your documents stay in memory. You stay in control.',
+  featureTitles: ['Compare with confidence', 'Ask in your language', 'Take the next step'],
+  lineCount: '{n} lines',
+  checkCount: '{n} billing checks',
   originalEnglish: 'Original English',
   appName: 'MedBill Auditor',
   banner: 'Informational only. This is not legal or medical advice. Your documents stay in memory and are deleted when you finish.',
@@ -92,6 +101,15 @@ const en = {
 export type Strings = typeof en
 
 const es: Strings = {
+  workspace: 'Revisión de su factura',
+  heroEyebrow: 'Claridad para su atención',
+  languageTitle: 'La atención habla su idioma.',
+  languageHelp: 'Escriba en el idioma que prefiera. Lo detectaremos y traduciremos la información.',
+  languageLink: 'Usar su idioma',
+  privacyShort: 'Sus documentos permanecen en la memoria. Usted mantiene el control.',
+  featureTitles: ['Compare con confianza', 'Pregunte en su idioma', 'Dé el siguiente paso'],
+  lineCount: '{n} líneas',
+  checkCount: '{n} revisiones de facturación',
   originalEnglish: 'Original en inglés',
   appName: 'Auditor de Facturas Médicas',
   banner: 'Solo informativo. No es asesoría legal ni médica. Sus documentos permanecen en la memoria y se borran cuando termina.',
@@ -182,6 +200,15 @@ const es: Strings = {
 }
 
 const mn: Strings = {
+  workspace: 'Таны нэхэмжлэхийн шалгалт',
+  heroEyebrow: 'Эмчилгээний төлбөрөө ойлгоё',
+  languageTitle: 'Тусламж таны хэлээр.',
+  languageHelp: 'Өөрт тохиромжтой хэлээр бичээрэй. Бид хэлийг таньж, мэдээллийг орчуулна.',
+  languageLink: 'Өөрийн хэлээр ашиглах',
+  privacyShort: 'Баримтууд зөвхөн санах ойд хадгалагдана. Та хяналтаа хадгална.',
+  featureTitles: ['Баримтаа харьцуулах', 'Өөрийн хэлээр асуух', 'Дараагийн алхмаа хийх'],
+  lineCount: '{n} мөр',
+  checkCount: '{n} төлбөрийн шалгалт',
   originalEnglish: 'Англи эх',
   appName: 'Эмнэлгийн нэхэмжлэх шалгагч',
   banner: 'Зөвхөн мэдээллийн зорилготой. Энэ нь хууль зүйн болон эмнэлгийн зөвлөгөө биш. Таны баримт бичиг санах ойд л байх бөгөөд дууссаны дараа устгагдана.',

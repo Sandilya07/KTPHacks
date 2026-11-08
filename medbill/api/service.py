@@ -19,7 +19,7 @@ from extraction.textlayer import TextLayerExtractor
 from i18n.demo_cache import load_demo_cache
 from i18n.glossary import supported_languages
 from i18n.languages import normalize_language
-from i18n.translate import Translator
+from i18n.translate import TranslationMemo, Translator
 from llm import LLMClient
 
 from .settings import Settings
@@ -59,8 +59,8 @@ def check_lang(lang: str) -> str:
         raise ApiError(422, f"Language '{lang}' is not supported.")
 
 
-def translator_for(llm: LLMClient | None, settings: Settings) -> Translator:
-    return Translator(None if settings.demo_mode else llm, cache=load_demo_cache())
+def translator_for(llm: LLMClient | None, settings: Settings, memo: TranslationMemo | None = None) -> Translator:
+    return Translator(None if settings.demo_mode else llm, cache=load_demo_cache(), memo=memo)
 
 
 def wording_model(llm: LLMClient | None, settings: Settings) -> LLMClient | None:
@@ -185,7 +185,7 @@ def _audit_payload(rec: Record, llm: LLMClient | None, settings: Settings, lang:
     case = run_case(rec.case)
     case.language = lang
     explainer = Explainer(wording_model(llm, settings))
-    translator = translator_for(llm, settings)
+    translator = translator_for(llm, settings, memo=rec.translation_memo)
     items = []
     for f in case.findings:
         e = explainer.explain(case, f)

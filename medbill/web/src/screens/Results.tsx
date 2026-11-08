@@ -4,11 +4,12 @@ import { ErrorBox, Screen, Spinner } from '../components/Chrome'
 import DocViewer from '../components/DocViewer'
 import { fmt, money, type Strings } from '../strings'
 import type { AuditResult, CaseView, Finding, Highlight } from '../types'
+import Icon from '../components/Icon'
 
 const TIER_STYLE = {
-  definite: { border: 'border-red-700', badge: 'bg-red-800 text-white', icon: '■' },
-  likely: { border: 'border-amber-600', badge: 'bg-amber-800 text-white', icon: '▲' },
-  ask: { border: 'border-blue-700', badge: 'bg-blue-800 text-white', icon: '?' },
+  definite: { border: 'tier-definite', badge: 'bg-red-800 text-white', icon: '■' },
+  likely: { border: 'tier-likely', badge: 'bg-amber-800 text-white', icon: '▲' },
+  ask: { border: 'tier-ask', badge: 'bg-blue-800 text-white', icon: '?' },
 } as const
 
 interface Props {
@@ -20,7 +21,7 @@ function FindingCard({ s, f, active, onEvidence }: { s: Strings; f: Finding; act
   const st = TIER_STYLE[f.tier]
   const shown = f.translated ?? f.explanation
   return (
-    <article className={`card border-2 ${st.border}`} aria-labelledby={`f-${f.id}`} data-testid={`finding-${f.rule}`}>
+    <article className={`card finding-card ${st.border}`} aria-labelledby={`f-${f.id}`} data-testid={`finding-${f.rule}`}>
       <div className="flex flex-wrap items-center gap-3">
         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-base font-bold ${st.badge}`}><span aria-hidden>{st.icon}</span>{s.tiers[f.tier]}</span>
         <span className="text-base text-slate-700">{s.tierHelp[f.tier]}</span>
@@ -66,7 +67,9 @@ export default function Results({ s, lang, kase, audit, auditKey, setAudit, high
 
   const sampleParts = audit ? Object.entries(audit.rules_data).filter(([, v]) => v === 'sample').map(([k]) => k.toUpperCase()).join(', ') : ''
   const headline = !audit ? '' : audit.total_impact > 0 ? fmt(s.overcharged, { amount: money(audit.total_impact) }) : audit.no_errors ? s.noErrors : s.questionsHeadline
-  const tone = !audit ? '' : audit.total_impact > 0 ? 'border-red-700 bg-red-50 text-red-950' : audit.no_errors ? 'border-green-700 bg-green-50 text-green-950' : 'border-blue-700 bg-blue-50 text-blue-950'
+  const tone = audit?.no_errors ? 'is-clean' : audit?.total_impact === 0 ? 'is-question' : ''
+  const amount = audit && audit.total_impact > 0 ? money(audit.total_impact) : ''
+  const headlineParts = amount ? headline.split(amount) : [headline]
 
   return (
     <Screen title={s.resultsTitle}>
@@ -74,11 +77,17 @@ export default function Results({ s, lang, kase, audit, auditKey, setAudit, high
       {error && <ErrorBox s={s} message={error} onRetry={() => setAttempt((n) => n + 1)} />}
       {audit && !busy && (
         <>
-          <div className={`rounded-2xl border-2 p-6 ${tone}`} role="status" data-testid="headline">
-            <p className="text-4xl font-extrabold leading-tight">{headline}</p>
-            {audit.no_errors && <p className="mt-2 text-xl">{s.noErrorsBody}</p>}
+          <div className={`result-summary ${tone}`} role="status" data-testid="headline">
+            <p className="result-summary-label"><Icon name={audit.no_errors ? 'shield' : 'search'} />{s.resultsTitle}</p>
+            <h2>{headlineParts[0]}{amount && <strong className="result-amount" dir="ltr">{amount}</strong>}{headlineParts[1]}</h2>
+            {audit.no_errors && <p className="mt-3 text-sm leading-relaxed">{s.noErrorsBody}</p>}
           </div>
-          <div className="grid gap-5 2xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <div className="result-metrics">
+            <div className="result-metric"><Icon name="document" /><span><strong>{s.billTab}</strong><small>{fmt(s.lineCount, { n: kase.bill.lines.length })}</small></span></div>
+            <div className="result-metric"><Icon name="shield" /><span><strong>{s.eobTab}</strong><small>{fmt(s.lineCount, { n: kase.eob.lines.length })}</small></span></div>
+            <div className="result-metric"><Icon name="check" /><span><strong>{fmt(s.checkCount, { n: audit.checked.length })}</strong><small>{s.workspace}</small></span></div>
+          </div>
+          <div className="results-grid">
             <div className="space-y-5">
               {audit.findings.map((f) => (
                 <FindingCard key={f.id} s={s} f={f} active={highlight.ids.join() === f.line_ids.join()}
@@ -90,7 +99,7 @@ export default function Results({ s, lang, kase, audit, auditKey, setAudit, high
                 {sampleParts && <p className="mt-3 text-base text-slate-700">{fmt(s.rulesDataNote, { parts: sampleParts })}</p>}
               </details>
             </div>
-            <div className="2xl:sticky 2xl:top-4 2xl:self-start"><DocViewer s={s} kase={kase} highlight={highlight} /></div>
+            <div className="results-evidence"><DocViewer s={s} kase={kase} highlight={highlight} /></div>
           </div>
           <div className="flex flex-wrap gap-3">
             <button type="button" className="btn-primary text-xl" onClick={onAsk}>{s.askNext}</button>

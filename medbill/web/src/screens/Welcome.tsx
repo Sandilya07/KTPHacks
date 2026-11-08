@@ -3,8 +3,11 @@ import type { Config } from '../types'
 import { type Strings, interfaceText } from '../strings'
 import { detectLanguage } from '../api'
 import { Screen } from '../components/Chrome'
+import Icon, { MedicalArt, type IconName } from '../components/Icon'
 
 interface Props { s: Strings; config: Config; lang: string; setLang: (l: string, values?: Record<string, string>) => void; onStart: () => void }
+const featureIcons: IconName[] = ['document', 'globe', 'letter']
+
 export default function Welcome({ s, config, lang, setLang, onStart }: Props) {
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
@@ -19,26 +22,39 @@ export default function Welcome({ s, config, lang, setLang, onStart }: Props) {
     } catch (e) { setNotice(e instanceof Error ? e.message : s.tryAgain) }
     finally { setBusy(false) }
   }
-  return <Screen title={s.welcomeTitle}>
-    <div className="welcome-grid">
-      <div className="hero-panel">
-        <span className="eyebrow">{s.appName}</span>
+  return <Screen title={s.welcomeTitle} className="welcome-screen" hero={
+    <div className="welcome-hero">
+      <div className="hero-text">
+        <span className="eyebrow hero-eyebrow"><Icon name="pulse" />{s.heroEyebrow}</span>
+        <h1 tabIndex={-1}>{s.welcomeTitle}<span className="heading-dot" aria-hidden /></h1>
         <p className="hero-copy">{s.welcomeBody}</p>
-        <div className="feature-list">{s.welcomePoints.map((point, i) => <div key={point}><span className="feature-number">0{i + 1}</span><p>{point}</p></div>)}</div>
-        <button type="button" className="btn-primary" disabled={busy} onClick={onStart}>{s.start} <span aria-hidden>→</span></button>
+        <div className="hero-actions">
+          <button type="button" className="btn-primary" disabled={busy} onClick={onStart}>{s.start}<Icon name="arrow" className="directional-icon" /></button>
+          <a className="text-link" href="#language-support">{s.languageLink}<Icon name="globe" /></a>
+        </div>
       </div>
-      <div className="card language-card">
-        <div className="language-icon" aria-hidden>文 / A</div>
-        <h2 className="text-2xl font-semibold">{s.askTitle}</h2>
-        <p className="mt-3 text-slate-600">{s.welcomePoints[1]}</p>
-        <form className="mt-5 space-y-3" onSubmit={(e) => { e.preventDefault(); void detect() }}>
-          <label htmlFor="language-text" className="block font-semibold">{s.askPlaceholder}</label>
-          <textarea id="language-text" dir="auto" className="field min-h-32" maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} placeholder="Hola, quiero entender mi factura…" />
-          <button className="btn-secondary w-full" disabled={busy || text.trim().length < 2}>{busy ? s.loading : s.send}</button>
-        </form>
-        <p className="mt-4 text-sm text-slate-600" role="status">{notice || (lang === 'en' ? 'Type in your language. We detect it and translate your experience.' : lang.toUpperCase())}</p>
-        {config.demo_mode && <p className="mt-3 text-sm text-slate-600">Offline demo: English · Español · Монгол</p>}
+      <MedicalArt />
+    </div>
+  }>
+    <div className="feature-grid">
+      {s.welcomePoints.map((point, i) => <div className="feature-card" key={i}>
+        <span className="feature-icon"><Icon name={featureIcons[i]} /></span>
+        <div><h2>{s.featureTitles[i]}</h2><p>{point}</p></div>
+      </div>)}
+    </div>
+    <div className="card language-panel" id="language-support">
+      <div className="language-intro"><span className="language-symbol" aria-hidden>文<span>/</span>A</span>
+        <h2>{s.languageTitle}</h2><p>{s.languageHelp}</p>
+        <div className="language-greetings" aria-hidden><span>Hello</span><i /> <span>Hola</span><i /><span lang="hi">नमस्ते</span><i /><span lang="ar">مرحبا</span></div>
       </div>
+      <form className="language-form" onSubmit={(e) => { e.preventDefault(); void detect() }}>
+        <label htmlFor="language-text">{s.askPlaceholder}</label>
+        <div className="language-input-wrap"><textarea id="language-text" dir="auto" className="field" maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} placeholder="Hola, quiero entender mi factura..." /></div>
+        <div className="language-form-bottom"><span className="language-status" role="status">{notice || (lang !== 'en' ? lang.toUpperCase() : s.welcomePoints[1])}</span>
+          <button className="btn-secondary" disabled={busy || text.trim().length < 2}>{busy ? s.loading : s.send}<Icon name={busy ? 'pulse' : 'arrow'} className={busy ? 'pulse-icon' : 'directional-icon'} /></button>
+        </div>
+        {config.demo_mode && <p className="demo-label">Offline demo: English / Español / Монгол</p>}
+      </form>
     </div>
   </Screen>
 }

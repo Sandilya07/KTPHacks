@@ -8,7 +8,10 @@ from __future__ import annotations
 import logging
 import json
 import re
+from collections import OrderedDict
+from copy import deepcopy
 from dataclasses import dataclass, field
+from threading import Lock
 
 from llm import LLMClient
 
@@ -51,15 +54,52 @@ class Translation:
     source: str = "llm"  # "llm", "cache", "english"
 
 
+class TranslationMemo:
+    """Bounded, in-memory reuse for one case; discarded with the case, never persisted."""
+
+    def __init__(self, max_entries: int = 256):
+        self.max_entries = max_entries
+        self._items: OrderedDict[tuple[str, ...], object] = OrderedDict()
+        self._lock = Lock()
+
+    def get(self, key: tuple[str, ...]):
+        with self._lock:
+            if key not in self._items:
+                return None
+            self._items.move_to_end(key)
+            return deepcopy(self._items[key])
+
+    def put(self, key: tuple[str, ...], value: object) -> None:
+        with self._lock:
+            self._items[key] = deepcopy(value)
+            self._items.move_to_end(key)
+            while len(self._items) > self.max_entries:
+                self._items.popitem(last=False)
+
+
 class Translator:
     """`cache` maps language -> {masked English text: masked translation}. It lets demo mode work offline
     and, because it is keyed on the masked text, reuses a human-written translation for any numbers."""
 
     def __init__(self, llm: LLMClient | None = None, cache: dict[str, dict[str, str]] | None = None,
-                 max_retries: int = 1):
+                 max_retries: int = 1, memo: TranslationMemo | None = None):
         self.llm, self.cache, self.max_retries = llm, cache or {}, max_retries
+        self.memo = memo if memo is not None else TranslationMemo()
+        self._model_key = f"{getattr(llm, 'provider', '')}:{getattr(llm, 'model', id(llm))}"
+
+    def memo_key(self, operation: str, lang: str, text: str) -> tuple[str, ...]:
+        return self._model_key, operation, lang, text
 
     def detect_language(self, text: str) -> str:
+        key = self.memo_key("detect", "", text)
+        cached = self.memo.get(key)
+        if isinstance(cached, str):
+            return cached
+        result = self._detect_language(text)
+        self.memo.put(key, result)
+        return result
+
+    def _detect_language(self, text: str) -> str:
         from .qa import detect_language
         if self.llm is None:
             return detect_language(text)
@@ -121,6 +161,28 @@ class Translator:
         return result
 
     def translate(self, text: str, lang: str) -> Translation:
+        lang = normalize_language(lang)
+        key = self.memo_key("translate", lang, text)
+        cached = self.memo.get(key)
+        if isinstance(cached, Translation):
+            return cached
+        result = self._translate(text, lang)
+        if result.verified:
+            self.memo.put(key, result)
+        return result
+
+    def has_cached_translation(self, text: str, lang: str) -> bool:
+        """Whether a sentence can be translated without another model call."""
+        lang = normalize_language(lang)
+        if primary_language(lang) == "en":
+            return True
+        if isinstance(self.memo.get(self.memo_key("translate", lang, text)), Translation):
+            return True
+        protected = protect(text)
+        value = self.cache.get(lang, self.cache.get(primary_language(lang), {})).get(protected.masked)
+        return isinstance(value, str) and bool(value.strip()) and not verify_tokens(protected.masked, value, protected.mapping)
+
+    def _translate(self, text: str, lang: str) -> Translation:
         lang = normalize_language(lang)
         if primary_language(lang) == "en" or not text.strip():
             return Translation(text, lang, True, source="english")
@@ -204,6 +266,17 @@ class Translator:
 
     # ---- language -> English (questions) ----------------------------------------------------
     def to_english(self, text: str, lang: str) -> str | None:
+        lang = normalize_language(lang)
+        key = self.memo_key("to_english", lang, text)
+        cached = self.memo.get(key)
+        if isinstance(cached, str):
+            return cached
+        result = self._to_english(text, lang)
+        if result is not None:
+            self.memo.put(key, result)
+        return result
+
+    def _to_english(self, text: str, lang: str) -> str | None:
         text = ascii_digits(text)
         lang = normalize_language(lang)
         if primary_language(lang) == "en":

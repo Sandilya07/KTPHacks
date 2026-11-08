@@ -14,13 +14,14 @@ export function boxesOf(c: CaseView): Record<string, Box> {
   return out
 }
 
-interface Props { s: Strings; kase: CaseView; highlight: Highlight; className?: string }
+interface Props { s: Strings; kase: CaseView; highlight: Highlight; className?: string; scrollToHighlight?: boolean }
 
-export default function DocViewer({ s, kase, highlight, className = '' }: Props) {
+export default function DocViewer({ s, kase, highlight, className = '', scrollToHighlight = true }: Props) {
   const boxes = useMemo(() => boxesOf(kase), [kase])
   const lit = highlight.ids.filter((id) => boxes[id])
   const [doc, setDoc] = useState<Doc>('bill')
   const first = useRef<HTMLDivElement | null>(null)
+  const panel = useRef<HTMLDivElement | null>(null)
 
   // Switch to the document that holds the highlighted line, then scroll it into view.
   useEffect(() => {
@@ -29,7 +30,13 @@ export default function DocViewer({ s, kase, highlight, className = '' }: Props)
   }, [highlight.nonce])
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    first.current?.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' })
+    if (scrollToHighlight) first.current?.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' })
+    else if (first.current && panel.current) {
+      const target = first.current.getBoundingClientRect()
+      const bounds = panel.current.getBoundingClientRect()
+      panel.current.scrollTo({ top: panel.current.scrollTop + target.top - bounds.top - bounds.height / 2 + target.height / 2,
+        behavior: reduce ? 'auto' : 'smooth' })
+    }
   }, [highlight.nonce, doc])
 
   const names: Record<Doc, string> = { bill: s.billTab, eob: s.eobTab }
@@ -42,13 +49,13 @@ export default function DocViewer({ s, kase, highlight, className = '' }: Props)
       <div role="tablist" aria-label={s.yourDocument} className="mb-3 flex gap-2">
         {(['bill', 'eob'] as const).map((d) => (
           <button key={d} role="tab" type="button" id={`tab-${d}`} aria-selected={doc === d} aria-controls="doc-panel"
-            className={`min-h-11 rounded-lg border-2 px-4 font-semibold ${doc === d ? 'border-blue-800 bg-blue-50' : 'border-slate-400 bg-white'}`}
+            className="doc-tab"
             onClick={() => setDoc(d)}>
             {names[d]}{count(d) > 0 && <span aria-label={`${count(d)} highlighted`} className="ms-2 rounded-full bg-yellow-300 px-2 text-sm">{count(d)}</span>}
           </button>
         ))}
       </div>
-      <div id="doc-panel" role="tabpanel" aria-labelledby={`tab-${doc}`} tabIndex={0} className="max-h-[70vh] overflow-auto rounded-lg border border-slate-300 bg-slate-100">
+      <div ref={panel} id="doc-panel" role="tabpanel" aria-labelledby={`tab-${doc}`} tabIndex={0} className="max-h-[70vh] overflow-auto rounded-lg border border-slate-300 bg-slate-100">
         {dims.length === 0 && <p className="p-4">{s.noPreview}</p>}
         {dims.map((dim, page) => (
           <div key={page} className="relative" style={{ aspectRatio: `${dim.width} / ${dim.height}` }}>
