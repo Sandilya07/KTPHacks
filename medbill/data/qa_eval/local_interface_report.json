@@ -1,0 +1,66 @@
+{
+  "stage": "interface",
+  "model": "qwen3:4b",
+  "results": [
+    {
+      "expected": "fr",
+      "question": "Que signifie le code 80053 sur ma facture ?",
+      "detected": "fr",
+      "answer": {
+        "title": "Demandez votre facture",
+        "send": "Envoyer",
+        "total": "Montant en question : {amount}"
+      },
+      "passed": true,
+      "seconds": 15.5
+    },
+    {
+      "expected": "ar",
+      "question": "ماذا يعني الرمز 80053 في فاتورتي؟",
+      "detected": "ar",
+      "answer": {
+        "title": "اسأل عن فاتتك",
+        "send": "أرسل",
+        "total": "المبلغ المطلوب: {amount}"
+      },
+      "passed": true,
+      "seconds": 13.8
+    },
+    {
+      "expected": "hi",
+      "question": "मेरे बिल में कोड 80053 का क्या मतलब है?",
+      "detected": "hi",
+      "answer": {
+        "title": "कृपया अपने बिल के बारे में प्रश्न करें",
+        "send": "Send",
+        "total": "सवाल: {amount}"
+      },
+      "passed": true,
+      "seconds": 16.9
+    },
+    {
+      "expected": "zh",
+      "question": "我的账单上的80053代码是什么意思？",
+      "detected": "zh-Hans",
+      "answer": {
+        "title": "询问您的账单",
+        "send": "发送",
+        "total": "待查询金额：{amount}"
+      },
+      "passed": true,
+      "seconds": 13.1
+    },
+    {
+      "expected": "ja",
+      "question": "請求書のコード80053は何を意味しますか？",
+      "detected": "ja",
+      "answer": {
+        "title": "あなたの請求について問い合わせる",
+        "send": "送信",
+        "total": "チェックする金額: {amount}"
+      },
+      "passed": true,
+      "seconds": 12.0
+    }
+  ]
+}

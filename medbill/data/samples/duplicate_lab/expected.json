@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "total_impact": 30.0,
+  "rules": [
+    "duplicate_charge"
+  ]
+}

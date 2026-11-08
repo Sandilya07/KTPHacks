@@ -1,0 +1,258 @@
+{
+  "stage": "detect",
+  "model": "qwen3:1.7b",
+  "results": [
+    {
+      "expected": "en",
+      "question": "What does code 80053 on my bill mean?",
+      "detected": "en",
+      "passed": true,
+      "seconds": 0.6
+    },
+    {
+      "expected": "es",
+      "question": "¿Qué significa el código 80053 en mi factura?",
+      "detected": "es",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "fr",
+      "question": "Que signifie le code 80053 sur ma facture ?",
+      "detected": "fr",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "de",
+      "question": "Was bedeutet der Code 80053 auf meiner Rechnung?",
+      "detected": "de",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "pt",
+      "question": "O que significa o código 80053 na minha conta?",
+      "detected": "pt",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "it",
+      "question": "Cosa significa il codice 80053 sulla mia fattura?",
+      "detected": "it",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "nl",
+      "question": "Wat betekent code 80053 op mijn rekening?",
+      "detected": "nl",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "pl",
+      "question": "Co oznacza kod 80053 na moim rachunku?",
+      "detected": "pl",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "ru",
+      "question": "Что означает код 80053 в моём счёте?",
+      "detected": "ru",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "uk",
+      "question": "Що означає код 80053 у моєму рахунку?",
+      "detected": "ukr",
+      "passed": false,
+      "seconds": 0.5
+    },
+    {
+      "expected": "ar",
+      "question": "ماذا يعني الرمز 80053 في فاتورتي؟",
+      "detected": "ar",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "fa",
+      "question": "کد 80053 در صورتحساب من چه معنایی دارد؟",
+      "detected": "fa",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "he",
+      "question": "מה המשמעות של קוד 80053 בחשבון שלי?",
+      "detected": "he",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "ur",
+      "question": "میرے بل میں کوڈ 80053 کا کیا مطلب ہے؟",
+      "detected": "ur",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "hi",
+      "question": "मेरे बिल में कोड 80053 का क्या मतलब है?",
+      "detected": "hi",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "bn",
+      "question": "আমার বিলে 80053 কোডের অর্থ কী?",
+      "detected": "bn",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "ta",
+      "question": "எனது பில்லில் 80053 குறியீட்டின் பொருள் என்ன?",
+      "detected": "ml",
+      "passed": false,
+      "seconds": 0.6
+    },
+    {
+      "expected": "te",
+      "question": "నా బిల్లులో 80053 కోడ్ అంటే ఏమిటి?",
+      "detected": "en",
+      "passed": false,
+      "seconds": 0.6
+    },
+    {
+      "expected": "mr",
+      "question": "माझ्या बिलातील 80053 कोडचा अर्थ काय आहे?",
+      "detected": "hi",
+      "passed": false,
+      "seconds": 0.5
+    },
+    {
+      "expected": "gu",
+      "question": "મારા બિલમાં 80053 કોડનો અર્થ શું છે?",
+      "detected": "ml",
+      "passed": false,
+      "seconds": 0.6
+    },
+    {
+      "expected": "zh",
+      "question": "我的账单上的80053代码是什么意思？",
+      "detected": "zh",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "zh-Hant",
+      "question": "我的帳單上的80053代碼是什麼意思？",
+      "detected": "zh",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "ja",
+      "question": "請求書のコード80053は何を意味しますか？",
+      "detected": "ja",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "ko",
+      "question": "제 청구서의 코드 80053은 무엇을 의미하나요?",
+      "detected": "ko",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "vi",
+      "question": "Mã 80053 trên hóa đơn của tôi có nghĩa là gì?",
+      "detected": "vi",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "th",
+      "question": "รหัส 80053 ในใบเรียกเก็บเงินของฉันหมายถึงอะไร",
+      "detected": "th",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "id",
+      "question": "Apa arti kode 80053 pada tagihan saya?",
+      "detected": "id",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "tr",
+      "question": "Faturamdaki 80053 kodu ne anlama geliyor?",
+      "detected": "tr",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "sw",
+      "question": "Msimbo 80053 kwenye bili yangu unamaanisha nini?",
+      "detected": "sw",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "mn",
+      "question": "Миний нэхэмжлэх дээрх 80053 код юу гэсэн үг вэ?",
+      "detected": "khm",
+      "passed": false,
+      "seconds": 0.5
+    },
+    {
+      "expected": "ro",
+      "question": "Ce înseamnă codul 80053 de pe factura mea?",
+      "detected": "ro",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "el",
+      "question": "Τι σημαίνει ο κωδικός 80053 στον λογαριασμό μου;",
+      "detected": "el",
+      "passed": true,
+      "seconds": 0.5
+    },
+    {
+      "expected": "ne",
+      "question": "मेरो बिलमा 80053 कोडको अर्थ के हो?",
+      "detected": "hi",
+      "passed": false,
+      "seconds": 0.5
+    },
+    {
+      "expected": "fil",
+      "question": "Ano ang ibig sabihin ng code 80053 sa aking bayarin?",
+      "detected": "tl",
+      "passed": true,
+      "seconds": 0.4
+    },
+    {
+      "expected": "ms",
+      "question": "Apakah maksud kod 80053 pada bil saya?",
+      "detected": "id",
+      "passed": false,
+      "seconds": 0.4
+    },
+    {
+      "expected": "pa",
+      "question": "ਮੇਰੇ ਬਿੱਲ ਵਿੱਚ 80053 ਕੋਡ ਦਾ ਕੀ ਮਤਲਬ ਹੈ?",
+      "detected": "hin",
+      "passed": false,
+      "seconds": 0.6
+    }
+  ]
+}

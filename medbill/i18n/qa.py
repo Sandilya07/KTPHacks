@@ -252,6 +252,41 @@ LOCAL_QUESTION_TOOL = {
 }
 
 
+def quick_local_answer(case: Case, question: str, has_history: bool = False) -> Answer | None:
+    """Answer a few self-contained English questions from checked facts without inference.
+
+    Match the whole question: conversational references and unfamiliar wording still use the model.
+    """
+    normalized = " ".join(ascii_digits(question).lower().split()).rstrip("?!. ")
+    if has_history and normalized == "what happens next":
+        return None  # resolve this follow-up from the conversation, which may change its meaning
+    questions = {
+        "how much do i owe": "how_much_owe",
+        "how much do i actually owe": "how_much_owe",
+        "why was i charged twice": "charged_twice",
+        "why am i being overcharged": "overcharge_reason",
+        "why is my bill so high": "overcharge_reason",
+        "what should i say when i call billing": "what_to_say",
+        "what is an eob": "what_is_eob",
+        "what does eob mean": "what_is_eob",
+        "what happens next": "what_happens_next",
+        "can you explain all the charges again": "all_charges",
+        "explain all charges": "all_charges",
+    }
+    if intent := questions.get(normalized):
+        return build_answer(case, intent, question)
+    match = re.fullmatch(
+        r"(?:(?:what (?:is|was)|explain)(?: (?:the )?code)? ([a-z]\d{4}|\d{5})(?: on my bill)?"
+        r"|what does (?:code )?([a-z]\d{4}|\d{5})(?: on my bill)? mean)", normalized)
+    if match:
+        code = (match[1] or match[2]).upper()
+        lines = [line for line in case.bill.lines if line.code == code]
+        if not lines:
+            return Answer("", kind="defer", deferred=True)
+        return Answer.of([f"Code {code}: {code_note(case, code)}"], [line.id for line in lines], "code_meaning")
+    return None
+
+
 class QA:
     def __init__(self, translator: Translator, llm: LLMClient | None = None):
         self.translator, self.llm = translator, llm
@@ -387,13 +422,14 @@ class QA:
             return None
 
     def ask(self, case: Case, question: str, lang: str = "auto", history: list[dict] | None = None) -> QAResult:
-        lang = self.translator.detect_language(question) if lang == "auto" else lang
         local = getattr(self.llm, "provider", "") == "ollama"
+        natural = quick_local_answer(case, question, bool(history)) if local and (lang == "auto" or primary_language(lang) == "en") else None
+        lang = ("en" if natural is not None else self.translator.detect_language(question)) if lang == "auto" else lang
         # Local routing already accepts any language. Avoid a separate English translation when it succeeds.
         q_en = ascii_digits(question) if local and primary_language(lang) == "en" else None
-        natural = None
         if local:
-            natural = self._local_answer(case, ascii_digits(question), history or [])
+            if natural is None:
+                natural = self._local_answer(case, ascii_digits(question), history or [])
             if natural is not None and not natural.deferred and not validate_text(natural.text_en, qa_facts(case)).ok:
                 natural = None
         if natural is None:

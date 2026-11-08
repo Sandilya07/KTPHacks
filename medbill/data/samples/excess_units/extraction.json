@@ -1,0 +1,114 @@
+{
+ "bill": {
+  "provider": "Oak Street Health Center",
+  "account_number": "ACCT-12851",
+  "patient_balance": 55.0,
+  "lines": [
+   {
+    "date": "2025-10-17",
+    "code": "99214",
+    "modifiers": [],
+    "description": "Office visit, detailed",
+    "units": 1,
+    "billed": 220.0,
+    "patient_owed": 25.0,
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     522,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-11-17",
+    "code": "85025",
+    "modifiers": [],
+    "description": "Blood count, complete",
+    "units": 4,
+    "billed": 180.0,
+    "patient_owed": 30.0,
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     522,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ },
+ "eob": {
+  "payer": "Pioneer Health Partners",
+  "network_status": "in",
+  "total_patient_responsibility": 55.0,
+  "lines": [
+   {
+    "date": "2025-10-17",
+    "code": "99214",
+    "modifiers": [],
+    "allowed": 128.31,
+    "plan_paid": 103.31,
+    "patient_resp": 25.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     140,
+     552,
+     160
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   },
+   {
+    "date": "2025-11-17",
+    "code": "85025",
+    "modifiers": [],
+    "allowed": 135.21,
+    "plan_paid": 105.21,
+    "patient_resp": 30.0,
+    "status": "processed",
+    "adjustment_reason": "",
+    "page": 0,
+    "bbox": [
+     34,
+     160,
+     552,
+     180
+    ],
+    "confidence": {
+     "date": 0.97,
+     "code": 0.97,
+     "amounts": 0.97,
+     "description": 0.95,
+     "units": 0.97,
+     "status": 0.95
+    }
+   }
+  ]
+ }
+}

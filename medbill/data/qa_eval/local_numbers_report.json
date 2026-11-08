@@ -1,0 +1,51 @@
+{
+  "stage": "numbers",
+  "model": "qwen3:4b",
+  "results": [
+    {
+      "expected": "fr",
+      "question": "Que signifie le code 80053 sur ma facture ?",
+      "detected": "fr",
+      "answer": "Ligne B2: code 80053 sur 2024-03-05 coûts $95.00.",
+      "verified": true,
+      "passed": true,
+      "seconds": 15.3
+    },
+    {
+      "expected": "ar",
+      "question": "ماذا يعني الرمز 80053 في فاتورتي؟",
+      "detected": "ar",
+      "answer": "السطر B2: كود 80053 على 2024-03-05 التكلفة $95.00.",
+      "verified": true,
+      "passed": true,
+      "seconds": 8.8
+    },
+    {
+      "expected": "hi",
+      "question": "मेरे बिल में कोड 80053 का क्या मतलब है?",
+      "detected": "hi",
+      "answer": "लाइन B2: कोड 80053 पर 2024-03-05 खर्च $95.00.",
+      "verified": true,
+      "passed": true,
+      "seconds": 9.2
+    },
+    {
+      "expected": "zh",
+      "question": "我的账单上的80053代码是什么意思？",
+      "detected": "zh-Hans",
+      "answer": "行 B2: 代码 80053 在 2024-03-05 成本 $95.00.",
+      "verified": true,
+      "passed": true,
+      "seconds": 7.1
+    },
+    {
+      "expected": "ja",
+      "question": "請求書のコード80053は何を意味しますか？",
+      "detected": "ja",
+      "answer": "ライン B2: コード 80053 オン 2024-03-05 コスト $95.00.",
+      "verified": true,
+      "passed": true,
+      "seconds": 14.8
+    }
+  ]
+}

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import json
+import re
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from typing import Protocol
@@ -63,8 +64,9 @@ class OllamaLLM:
     def complete_tool(self, system: str, user: str, tool: dict) -> dict:
         budgets = {"detect_language": 64, "understand_bill_question": 160, "translate_interface": 1536,
                    "translate_spans": 1024, "to_english": 1024, "translate": 1024}
+        watch_translation = tool["name"] in ("translate_spans", "translate")
         payload = {
-            "model": self.model, "stream": False, "think": False, "keep_alive": "15m",
+            "model": self.model, "stream": watch_translation, "think": False, "keep_alive": "15m",
             "format": tool["input_schema"],
             "messages": [
                 {"role": "system", "content": system + "\nReturn a JSON object only, matching this schema: "
@@ -78,7 +80,7 @@ class OllamaLLM:
                           headers={"Content-Type": "application/json"}, method="POST")
         try:
             with urlopen(request, timeout=self.timeout) as response:
-                result = json.load(response)
+                result = self._read_translation(response) if watch_translation else json.load(response)
         except (HTTPError, URLError, TimeoutError) as exc:
             raise RuntimeError("Local AI is unavailable. Start Ollama and run: ollama pull " + self.model) from exc
         if result.get("done_reason") == "length":
@@ -87,6 +89,36 @@ class OllamaLLM:
         if not isinstance(content, dict):
             raise ValueError("Local model did not return a JSON object.")
         return content
+
+    @staticmethod
+    def _read_translation(response) -> dict:
+        """Cancel a translation as soon as it enters a loop the validator would reject anyway.
+
+        Streaming stays internal: callers receive only a complete JSON result for normal validation.
+        """
+        from i18n.languages import repetitive_output
+
+        content = ""
+        for line in response:
+            if not line.strip():
+                continue
+            event = json.loads(line)
+            if event.get("error"):
+                raise RuntimeError("Local translation failed.")
+            content += event.get("message", {}).get("content", "")
+            # Inspect individual JSON strings, including the currently unfinished value.
+            # Keys and repeated placeholders in separate values must not trigger the loop guard.
+            for match in re.finditer(r'"((?:\\.|[^"\\])*)(?:"|$)', content):
+                try:
+                    value = json.loads('"' + match[1] + '"')
+                except json.JSONDecodeError:
+                    continue  # a token may end in the middle of an escape sequence
+                if repetitive_output(value):
+                    raise RuntimeError("Local translation repeated itself; retrying with corrective feedback.")
+            if event.get("done"):
+                event["message"] = {"content": content}
+                return event
+        raise RuntimeError("Local translation ended before it was complete.")
 
 
 def llm_from_env() -> LLMClient | None:

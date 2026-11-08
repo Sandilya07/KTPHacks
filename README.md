@@ -75,6 +75,8 @@ Accessibility choices: 18px base type, high contrast, one primary action per scr
 
 Local model speed: Ollama keeps the configured model (default `qwen3:4b`) and interprets questions in their original language before trying an English translation fallback. Each case retains up to 256 recent successful translations, language detections, and question interpretations in memory. Repeated identical requests can avoid model calls; changing the question, conversation, language, or model uses a separate entry. Billing answers and evidence are rebuilt from current case data, so correcting a bill never reuses an old answer. Failed translations are retried rather than cached. The cache expires or is deleted with its case. Existing sentence translations are reused when all answer sentences are available.
 
+Clear, self-contained English questions such as "How much do I actually owe?", "Why am I being overcharged?", and "What is 80053?" use checked billing data directly, avoiding both language detection and model inference. Unfamiliar questions, context-dependent follow-ups, and other languages still use the model. Translation generation is streamed internally so repetitive output can be cancelled early and retried with feedback; only complete responses pass to the existing language and number checks.
+
 To measure the local pipeline using synthetic English, Spanish, and French questions (including repeated requests):
 
 ```bash
@@ -82,7 +84,7 @@ cd medbill
 python scripts/benchmark_local.py --output .pytest_cache/latency.json
 ```
 
-This is an opt-in live Ollama check, separate from the offline unit tests. First requests and new conversations still need inference; timings depend on the machine and whether the model is already loaded.
+This is an opt-in live Ollama check, separate from the offline unit tests. Questions outside the quick path can still need inference; timings depend on the machine and whether the model is already loaded.
 
 `DEMO_MODE=1` never calls a model. The sample cases replay stored extractions, explanations come from the deterministic templates, and translations come from `i18n/demo_cache_es.json` and `i18n/demo_cache_mn.json`: hand-written translations keyed by the *masked* English sentence (numbers replaced by tokens), so they are reused for any amounts and still pass the number-integrity check. `tests/test_demo_cache.py` fails if any sentence the three demo cases show is missing from either cache, and `python scripts/dump_demo_strings.py` prints the sentences that need a translation after a template changes.
 
