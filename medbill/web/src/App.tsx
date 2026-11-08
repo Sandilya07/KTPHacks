@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { createManual, deleteCase, getConfig } from './api'
 import { Banner, ErrorBox, Screen, Spinner, Stepper } from './components/Chrome'
+import { AnimatePresence } from 'framer-motion'
 import Icon from './components/Icon'
+import Intro from './components/Intro'
 import Ask, { type Msg } from './screens/Ask'
 import Letter from './screens/Letter'
 import Results from './screens/Results'
@@ -16,6 +18,8 @@ export default function App() {
   const [configError, setConfigError] = useState('')
   const [lang, setLang] = useState('en')
   const [step, setStep] = useState(0)
+  // The intro shows on every visit; `?intro=0` skips it (used by the automated browser tests).
+  const [intro, setIntro] = useState(() => new URLSearchParams(location.search).get('intro') !== '0')
   const [kase, setCase] = useState<CaseView | null>(null)
   const [audit, setAudit] = useState<AuditResult | null>(null)
   const [auditKey, setAuditKey] = useState('')
@@ -54,6 +58,7 @@ export default function App() {
 
   return (
     <>
+      <AnimatePresence>{intro && <Intro key="intro" onDone={() => setIntro(false)} />}</AnimatePresence>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3">{s.skip}</a>
       <Banner s={s} />
       <header className="app-header">

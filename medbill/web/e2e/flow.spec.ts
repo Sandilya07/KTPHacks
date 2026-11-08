@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 const SAMPLES = fileURLToPath(new URL('../../data/samples', import.meta.url))
 
 async function start(page: Page, sample: string, language = 'English') {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   if (language !== 'English') {
     await page.locator('#language-text').fill(language === 'Español' ? 'Quiero entender mi factura' : 'Би нэхэмжлэхээ ойлгохыг хүсэж байна')
     await page.getByRole('button', { name: 'Send', exact: true }).click()
@@ -30,7 +30,7 @@ for (const locale of [
     await page.route('**/api/language', async (route) => {
       await route.fulfill({ json: { language: locale.code, strings: locale.title ? { welcomeTitle: locale.title } : {} } })
     })
-    await page.goto('/')
+    await page.goto('/?intro=0')
     await page.locator('#language-text').fill(locale.text)
     await page.getByRole('button', { name: 'Send', exact: true }).click()
     await expect(page.locator('html')).toHaveAttribute('lang', locale.code)
@@ -112,7 +112,7 @@ test('typed overcharge question explains the flagged charges', async ({ page }) 
 })
 
 test('additional sample documents can be downloaded and reviewed', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await page.getByRole('button', { name: 'Get started' }).click()
   for (const sample of ['duplicate_lab', 'bundled_tests', 'insurance_mismatch', 'balance_billing', 'excess_units', 'routine_visit']) {
     await expect(page.getByTestId(`sample-${sample}`)).toBeVisible()
@@ -159,13 +159,13 @@ test('Spanish interface, results and question', async ({ page }) => {
 })
 
 test('uploads: a PDF is read, a photo without a model gives a plain message', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await page.getByRole('button', { name: 'Get started' }).click()
   await page.getByTestId('bill-input').setInputFiles(`${SAMPLES}/overcharge/bill.pdf`)
   await page.getByTestId('eob-input').setInputFiles(`${SAMPLES}/overcharge/eob.pdf`)
   await page.getByRole('button', { name: 'Read my documents' }).click()
   await page.getByTestId('looks-right').waitFor()
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await page.getByRole('button', { name: 'Get started' }).click()
   await page.getByTestId('bill-input').setInputFiles(`${SAMPLES}/overcharge_photo/bill.jpg`)
   await page.getByTestId('eob-input').setInputFiles(`${SAMPLES}/overcharge_photo/eob.jpg`)
@@ -184,7 +184,7 @@ test('delete my data wipes the case', async ({ page }) => {
 })
 
 test('keyboard: focus moves to each screen heading and the skip link works', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await page.keyboard.press('Tab')
   await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeFocused()
   await page.getByRole('button', { name: 'Get started' }).focus()
@@ -193,7 +193,7 @@ test('keyboard: focus moves to each screen heading and the skip link works', asy
 })
 
 test('workflow navigation requires review and preserves question history', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?intro=0')
   const nav = page.getByRole('navigation')
   await expect(nav.getByRole('button', { name: 'Check', exact: true })).toBeDisabled()
   await expect(nav.getByRole('button', { name: 'Results', exact: true })).toBeDisabled()
@@ -218,7 +218,7 @@ test('workflow navigation requires review and preserves question history', async
 
 test('reduced motion leaves content visible without continuous animation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await expect(page.getByRole('heading', { name: 'Understand your medical bill' })).toBeVisible()
   const animations = await page.locator('.art-paper-front, .feature-card').evaluateAll((elements) =>
     elements.map((el) => ({ duration: parseFloat(getComputedStyle(el).animationDuration), iterations: getComputedStyle(el).animationIterationCount })))
@@ -249,7 +249,7 @@ test('accessibility: axe reports no critical violations on any screen', async ({
     const bad = r.violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
     expect(bad.map((v) => `${label}: ${v.id} (${v.impact})`), JSON.stringify(bad.map((v) => v.nodes.map((n) => ({ html: n.html, reason: n.failureSummary }))))).toEqual([])
   }
-  await page.goto('/')
+  await page.goto('/?intro=0')
   await check('welcome')
   await page.getByRole('button', { name: 'Get started' }).click()
   await check('upload')
@@ -286,4 +286,17 @@ test('Mongolian demo path: results, grounded answer and side-by-side letter, all
   await expect(sbs).toContainText('Маргаантай нийт дүн: $412.00.')
   await expect(sbs).toContainText('Total amount in question: $412.00.')
   await expect(page.getByRole('note')).toHaveCount(1)
+})
+
+test('intro greets every visitor and dismisses with the button or Escape', async ({ page }) => {
+  await page.goto('/')
+  const intro = page.getByRole('dialog')
+  await expect(intro.getByRole('heading', { name: /Language shouldn't hold you back/ })).toBeVisible()
+  await expect(intro.getByRole('button', { name: 'Get started' })).toBeFocused()
+  await intro.getByRole('button', { name: 'Get started' }).click()
+  await expect(intro).toBeHidden()
+  await page.reload()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toBeHidden()
 })
